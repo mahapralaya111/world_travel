@@ -1,0 +1,28 @@
+# 大体积运行时（本地大模型，1.8GB）
+ollama/
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 日志
+*.log
+
+# 本地数据库文件（已用 MySQL）
+*.db
+
+# 依赖目录
+node_modules/
+venv/
+.venv/
+
+# 编辑器
+.vscode/
+.idea/
+
+# 本地文档（不上传 GitHub）
+local_docs/
+*.docx
+
+# 密钥文件
+server/.secret_key
