@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的行程 - 国际旅游规划助手</title>
+<script src="/static/js/api.js"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        min-height: 100vh; background: #0f172a; color: #e2e8f0;
+    }
+    .topbar {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 28px; background: rgba(255,255,255,0.04);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px);
+    }
+    .topbar .logo { font-size: 18px; font-weight: 800; color: #fff; }
+    .topbar .logo span { color: #4a9eff; }
+    .topbar .nav a {
+        color: #94a3b8; text-decoration: none; font-size: 13px; margin-left: 18px;
+        padding: 6px 12px; border-radius: 8px; transition: all .2s ease;
+    }
+    .topbar .nav a:hover, .topbar .nav a.active { color: #fff; background: rgba(74,158,255,0.15); }
+    .container { max-width: 1100px; margin: 0 auto; padding: 30px 28px 60px; }
+    .page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; }
+    .page-head h2 { font-size: 22px; }
+    .page-head .sub { color: #64748b; font-size: 13px; margin-top: 4px; }
+    .btn {
+        padding: 10px 22px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+        cursor: pointer; transition: all .2s ease; background: linear-gradient(135deg, #4a9eff, #2563eb);
+        color: #fff;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(74,158,255,0.35); }
+    .btn.ghost { background: rgba(255,255,255,0.08); color: #cbd5e1; }
+    .btn.danger { background: rgba(255,82,82,0.12); color: #ff6b6b; }
+    .btn.ghost:hover { background: rgba(255,255,255,0.14); }
+    .btn.danger:hover { background: rgba(255,82,82,0.22); }
+
+    .login-tip {
+        text-align: center; padding: 70px 20px; background: rgba(255,255,255,0.04);
+        border: 1px dashed rgba(255,255,255,0.15); border-radius: 16px;
+    }
+    .login-tip .icon { font-size: 44px; margin-bottom: 14px; }
+    .login-tip p { color: #94a3b8; margin-bottom: 20px; font-size: 15px; }
+
+    .trip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+    .trip-card {
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 16px; padding: 20px; cursor: pointer; transition: all .2s ease;
+        position: relative; overflow: hidden;
+    }
+    .trip-card::before {
+        content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+        background: var(--color, #4a9eff);
+    }
+    .trip-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.08); box-shadow: 0 12px 30px rgba(0,0,0,0.3); }
+    .trip-card .name { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .trip-card .desc { font-size: 13px; color: #94a3b8; min-height: 38px; line-height: 1.5; }
+    .trip-card .meta { display: flex; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
+    .trip-card .meta span { font-size: 12px; color: #64748b; background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 20px; }
+    .trip-card .dates { font-size: 12px; color: #64748b; margin-top: 8px; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
+    .trip-weather { display:inline-flex; align-items:center; gap:6px; font-size:12px;
+        color:#fbbf24; background: rgba(251,191,36,0.08); padding: 3px 8px;
+        border-radius: 999px; border: 1px solid rgba(251,191,36,0.2); white-space: nowrap; }
+    .trip-weather.loading { color:#64748b; background:rgba(100,116,139,0.08); border-color: rgba(100,116,139,0.2); }
+    .trip-weather.fail { color:#ff5252; background: rgba(255,82,82,0.08); border-color: rgba(255,82,82,0.2); }
+    .trip-card .actions { display: flex; gap: 8px; margin-top: 16px; }
+    .trip-card .actions .btn { flex: 1; padding: 8px 0; font-size: 13px; border-radius: 8px; }
+    .trip-card .current-badge {
+        position: absolute; top: 14px; right: 14px; font-size: 11px; color: #4ade80;
+        background: rgba(74,222,128,0.12); padding: 3px 10px; border-radius: 20px;
+    }
+
+    /* Modal */
+    .modal-mask {
+        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+        z-index: 100; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-mask.show { display: flex; }
+    .modal {
+        width: 100%; max-width: 460px; background: #1e293b; border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px; padding: 26px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .modal h3 { color: #fff; font-size: 17px; margin-bottom: 20px; }
+    .modal .form-group { margin-bottom: 14px; }
+    .modal .form-group label { display: block; color: #cbd5e1; font-size: 13px; margin-bottom: 6px; }
+    .modal .form-group input, .modal .form-group select, .modal .form-group textarea {
+        width: 100%; padding: 10px 12px; background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(255,255,255,0.13); border-radius: 8px; color: #fff;
+        font-size: 14px; outline: none; font-family: inherit;
+    }
+    .modal .form-group input:focus, .modal .form-group select:focus { border-color: #4a9eff; }
+    .modal .form-group textarea { resize: vertical; min-height: 60px; }
+    .modal .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .status-bar {
+        position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+        background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.12);
+        color: #e2e8f0; padding: 10px 22px; border-radius: 30px; font-size: 13px;
+        display: none; z-index: 200; backdrop-filter: blur(8px);
+    }
+    .status-bar.show { display: block; animation: fadeIn .2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%); } }
+    .empty { text-align: center; color: #475569; padding: 50px 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+    <div class="logo">🌍 国际旅游规划<span>助手</span></div>
+    <div class="nav">
+        <a href="/">🗺️ 地图</a>
+        <a href="/pages/trips.html" class="active">🗂️ 我的行程</a>
+        <a href="/pages/planner.html">🧭 行程规划</a>
+        <a href="/pages/dashboard.html">📊 统计看板</a>
+        <a href="/pages/notes.html">📖 游记广场</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-head">
+        <div>
+            <h2>🗂️ 我的行程</h2>
+            <div class="sub">创建多个旅行计划，每个行程拥有独立的批注与路线</div>
+        </div>
+        <button class="btn" onclick="openCreateModal()">+ 新建行程</button>
+    </div>
+
+    <div id="loginTip" style="display:none;">
+        <div class="login-tip">
+            <div class="icon">🔐</div>
+            <p>登录后即可创建并管理云端行程</p>
+            <a class="btn" href="/pages/login.html">前往登录</a>
+        </div>
+    </div>
+
+    <div id="tripGrid"></div>
+</div>
+
+<!-- 新建/编辑行程弹窗 -->
+<div class="modal-mask" id="modal">
+    <div class="modal">
+        <h3 id="modalTitle">新建行程</h3>
+        <div class="form-group">
+            <label>行程名称 *</label>
+            <input type="text" id="f_name" placeholder="如：欧洲五国深度游">
+        </div>
+        <div class="form-group">
+            <label>行程描述</label>
+            <textarea id="f_desc" placeholder="简要描述这次旅行的主题和规划..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>起止日期</label>
+            <div style="display:flex;gap:10px;">
+                <input type="date" id="f_start" style="flex:1;">
+                <input type="date" id="f_end" style="flex:1;">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>状态 <span style="font-weight:normal;color:#888;font-size:12px;">（默认自动根据日期判断）</span></label>
+            <select id="f_status">
+                <option value="">🔄 自动判断（推荐）</option>
+                <option value="planning">📝 规划中</option>
+                <option value="ongoing">🚀 进行中</option>
+                <option value="finished">✅ 已完成</option>
+            </select>
+        </div>
+        <div class="actions">
+            <button class="btn ghost" onclick="closeModal()">取消</button>
+            <button class="btn" onclick="saveTrip()">保存</button>
+        </div>
+    </div>
+</div>
+
+<div class="status-bar" id="statusBar"></div>
+
+<script>
+    let editingId = null;
+
+    function toast(msg) {
+        const el = document.getElementById('statusBar');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(el._t);
+        el._t = setTimeout(() => el.classList.remove('show'), 2000);
+    }
+
+    function statusText(status) {
+        return { planning: '📝 规划中', ongoing: '🚀 进行中', finished: '✅ 已完成' }[status] || status;
+    }
+
+    function colorOf(s) {
+        return { planning: '#4a9eff', ongoing: '#f59e0b', finished: '#4ade80' }[s] || '#4a9eff';
+    }
+
+    async function loadTrips() {
+        if (!API.isLoggedIn()) {
+            document.getElementById('loginTip').style.display = '';
+            document.getElementById('tripGrid').innerHTML = '';
+            return;
+        }
+        const res = await API.listTrips();
+        if (res.code !== 0) {
+            if (res.msg) toast(res.msg);
+            return;
+        }
+        const trips = res.data || [];
+        const grid = document.getElementById('tripGrid');
+        if (trips.length === 0) {
+            grid.innerHTML = '<div class="empty">还没有行程，点击右上角"新建行程"开始规划吧 🌍</div>';
+            return;
+        }
+        grid.innerHTML = trips.map(t => {
+            const showStatus = t.computed_status || t.status || 'planning';
+            const auto = t.status_auto;
+            // 找首个可拿到坐标的行程城市（优先 plan_data.days[0]）
+            var firstCoord = null;
+            try {
+                if (t.plan_data && Array.isArray(t.plan_data.days) && t.plan_data.days.length) {
+                    var d = t.plan_data.days.find(function(x){ return x && x.lat != null && x.lng != null; });
+                    if (d) firstCoord = { lat:+d.lat, lng:+d.lng, label:d.city || '首站' };
+                }
+            } catch(e) {}
+            var weatherHtml = '';
+            if (firstCoord) {
+                weatherHtml = '<span class="trip-weather loading" data-tid="' + escapeHtml(String(t.id)) +
+                    '" data-lat="' + escapeHtml(String(firstCoord.lat)) +
+                    '" data-lng="' + escapeHtml(String(firstCoord.lng)) +
+                    '" data-date="' + escapeHtml(t.start_date || '') +
+                    '">⏳ ' + escapeHtml(firstCoord.label || '') + '天气…</span>';
+            }
+            return `
+            <div class="trip-card" style="--color:${colorOf(showStatus)}">
+                ${String(t.id) === String(API.currentTripId) ? '<span class="current-badge">● 当前行程</span>' : ''}
+                <div class="name">${escapeHtml(t.name)}</div>
+                <div class="desc">${escapeHtml(t.description || '暂无描述')}</div>
+                <div class="dates"><span>📅 ${escapeHtml(t.start_date || '未定')} ~ ${escapeHtml(t.end_date || '未定')}</span>${weatherHtml}</div>
+                <div class="meta">
+                    <span>🌍 ${t.country_count} 个国家</span>
+                    <span>📌 ${t.annotation_count} 条批注</span>
+                    <span>🗺️ ${t.route_count} 条路线</span>
+                    <span>${statusText(showStatus)}${auto ? ' <small style="opacity:.6;">🔄自动</small>' : ''}</span>
+                </div>
+                <div class="actions" onclick="event.stopPropagation()">
+                    <button class="btn" onclick="switchTrip(${t.id})">打开</button>
+                    <button class="btn ghost" onclick="openEditModal(${t.id})">编辑</button>
+                    <button class="btn danger" onclick="removeTrip(${t.id})">删除</button>
+                </div>
+            </div>`;
+        }).join('');
+
+        // 异步为每个行程加载天气
+        var cache = window.__TRIP_WEATHER_CACHE__ || {};
+        window.__TRIP_WEATHER_CACHE__ = cache;
+        setTimeout(function() {
+            document.querySelectorAll('.trip-weather.loading[data-lat][data-lng]').forEach(function(el) {
+                var lat = +el.dataset.lat, lng = +el.dataset.lng;
+                if (lat == null || lng == null || isNaN(lat) || isNaN(lng)) {
+                    el.className = 'trip-weather fail';
+                    el.textContent = '⚠️ 缺坐标';
+                    return;
+                }
+                var offset = 0;
+                if (el.dataset.date && /^\d{4}-\d{1,2}-\d{1,2}$/.test(el.dataset.date)) {
+                    var today = new Date(); today.setHours(0,0,0,0);
+                    var d = new Date(el.dataset.date + 'T00:00:00');
+                    offset = Math.max(0, Math.round((d.getTime() - today.getTime()) / 86400000));
+                }
+                var k = Math.round(lat*100) + '_' + Math.round(lng*100);
+                var now = Date.now();
+                function tryCache() {
+                    if (!cache[k] || now - cache[k].time > 30 * 60 * 1000) return false;
+                    var daily = cache[k].data.daily || [];
+                    var dd = daily[Math.min(offset, daily.length - 1)];
+                    if (!dd) return false;
+                    el.className = 'trip-weather';
+                    el.title = (dd.weather || '') + ' · ' + (cache[k].data.location || '');
+                    el.textContent =
+                        (dd.emoji || (dd.weather || '')) + ' ' +
+                        (dd.temp_max != null ? dd.temp_max : '--') + '° / ' +
+                        (dd.temp_min != null ? dd.temp_min : '--') + '°';
+                    return true;
+                }
+                if (tryCache()) return;
+                API.getWeather(lat, lng, Math.max(7, offset + 3))
+                    .then(function(r) {
+                        if (!r || r.code !== 0 || !r.data || !Array.isArray(r.data.daily) || !r.data.daily.length) {
+                            el.className = 'trip-weather fail';
+                            el.textContent = '⚠️ 无天气';
+                            return;
+                        }
+                        cache[k] = { time: Date.now(), data: r.data };
+                        if (!tryCache()) {
+                            el.className = 'trip-weather fail';
+                            el.textContent = '⚠️ 无天气';
+                        }
+                    })
+                    .catch(function() {
+                        el.className = 'trip-weather fail';
+                        el.textContent = '⚠️ 加载失败';
+                    });
+            });
+        }, 50);
+    }
+
+    function escapeHtml(s) {
+        return String(s || '').replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[c]);
+    }
+
+    async function switchTrip(id) {
+        API.currentTripId = id;
+        toast('已切换到该行程');
+        await loadTrips();
+    }
+
+    function openCreateModal() {
+        editingId = null;
+        document.getElementById('modalTitle').textContent = '新建行程';
+        document.getElementById('f_name').value = '';
+        document.getElementById('f_desc').value = '';
+        document.getElementById('f_start').value = '';
+        document.getElementById('f_end').value = '';
+        document.getElementById('f_status').value = '';   // 默认自动
+        document.getElementById('modal').classList.add('show');
+    }
+
+    async function openEditModal(id) {
+        const res = await API.listTrips();
+        const trip = (res.data || []).find(t => t.id === id);
+        if (!trip) return;
+        editingId = id;
+        document.getElementById('modalTitle').textContent = '编辑行程';
+        document.getElementById('f_name').value = trip.name;
+        document.getElementById('f_desc').value = trip.description || '';
+        document.getElementById('f_start').value = trip.start_date || '';
+        document.getElementById('f_end').value = trip.end_date || '';
+        // status 为空字符串 → 自动；否则用用户设置的手动值
+        document.getElementById('f_status').value = trip.status || '';
+        document.getElementById('modal').classList.add('show');
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.remove('show');
+    }
+
+    async function saveTrip() {
+        const name = document.getElementById('f_name').value.trim();
+        if (!name) { toast('请输入行程名称'); return; }
+        const data = {
+            name,
+            description: document.getElementById('f_desc').value.trim(),
+            start_date: document.getElementById('f_start').value,
+            end_date: document.getElementById('f_end').value,
+            status: document.getElementById('f_status').value,
+        };
+        const res = editingId
+            ? await API.updateTrip(editingId, data)
+            : await API.createTrip(data);
+        if (res.code === 0) {
+            toast(editingId ? '行程已更新' : '行程创建成功');
+            closeModal();
+            await loadTrips();
+        } else {
+            toast(res.msg || '保存失败');
+        }
+    }
+
+    async function removeTrip(id) {
+        if (!confirm('确定删除该行程吗？其下的所有批注和路线将一并删除！')) return;
+        const res = await API.deleteTrip(id);
+        if (res.code === 0) {
+            if (String(id) === String(API.currentTripId)) API.currentTripId = '';
+            toast('行程已删除');
+            await loadTrips();
+        } else {
+            toast(res.msg || '删除失败');
+        }
+    }
+
+    // 已登录直接加载
+    loadTrips();
+</script>
+</body>
+</html>
