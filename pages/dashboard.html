@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>统计看板 - 国际旅游规划助手</title>
+<script src="/static/js/api.js"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        min-height: 100vh; background: #0f172a; color: #e2e8f0;
+    }
+    .topbar {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 28px; background: rgba(255,255,255,0.04);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px);
+    }
+    .topbar .logo { font-size: 18px; font-weight: 800; color: #fff; }
+    .topbar .logo span { color: #4a9eff; }
+    .topbar .nav a {
+        color: #94a3b8; text-decoration: none; font-size: 13px; margin-left: 18px;
+        padding: 6px 12px; border-radius: 8px; transition: all .2s ease;
+    }
+    .topbar .nav a:hover, .topbar .nav a.active { color: #fff; background: rgba(74,158,255,0.15); }
+    .container { max-width: 1100px; margin: 0 auto; padding: 30px 28px 60px; }
+    .page-head { margin-bottom: 26px; }
+    .page-head h2 { font-size: 22px; }
+    .page-head .sub { color: #64748b; font-size: 13px; margin-top: 4px; }
+
+    .tabs { display: flex; gap: 10px; margin-bottom: 24px; }
+    .tab {
+        padding: 9px 22px; border-radius: 10px; cursor: pointer; font-size: 14px;
+        background: rgba(255,255,255,0.06); color: #94a3b8; border: 1px solid rgba(255,255,255,0.08);
+        transition: all .2s ease;
+    }
+    .tab.active { background: rgba(74,158,255,0.15); color: #4a9eff; border-color: rgba(74,158,255,0.4); }
+
+    /* --- 指标卡 --- */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 14px; padding: 20px; text-align: center; transition: all .2s ease;
+        position: relative; overflow: hidden;
+    }
+    .stat-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-3px); }
+    .stat-card .num { font-size: 30px; font-weight: 800; color: #fff; margin: 6px 0; }
+    .stat-card .label { font-size: 12px; color: #94a3b8; }
+    .stat-card .icon { font-size: 22px; }
+    .stat-card .sub { font-size: 11px; color: #475569; margin-top: 3px; }
+    .stat-card .badge {
+        position: absolute; top: 8px; right: 8px; font-size: 10px;
+        padding: 2px 7px; border-radius: 10px; background: rgba(74,158,255,0.18); color: #4a9eff;
+    }
+    .stat-card.progress-card .num { text-align: left; }
+    .stat-card.progress-card .progress-bg {
+        height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 8px; overflow: hidden;
+    }
+    .stat-card.progress-card .progress-fill {
+        height: 100%; background: linear-gradient(90deg, #4a9eff, #818cf8); border-radius: 3px; transition: width .8s ease;
+    }
+
+    /* --- 通用面板 --- */
+    .panel {
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 14px; padding: 22px; margin-bottom: 20px;
+    }
+    .panel h3 { font-size: 15px; margin-bottom: 16px; color: #fff; display: flex; align-items: center; gap: 8px; }
+    .panel h3 .hint { font-size: 11px; color: #64748b; font-weight: 400; margin-left: auto; }
+
+    /* --- 国家 Top bars --- */
+    .bar-item { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .bar-item .name { width: 110px; font-size: 13px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-item .bar-bg { flex: 1; height: 14px; background: rgba(255,255,255,0.07); border-radius: 7px; overflow: hidden; }
+    .bar-item .bar { height: 100%; background: linear-gradient(90deg, #4a9eff, #818cf8); border-radius: 7px; transition: width .8s ease; }
+    .bar-item .cnt { width: 44px; font-size: 12px; color: #64748b; text-align: right; }
+
+    /* --- 行程完成度 --- */
+    .trip-completion-item {
+        display: grid; grid-template-columns: 1fr 100px 120px 100px;
+        align-items: center; gap: 14px; padding: 14px;
+        background: rgba(255,255,255,0.04); border-radius: 10px; margin-bottom: 10px;
+        border: 1px solid rgba(255,255,255,0.06);
+    }
+    .trip-completion-item .tname { font-size: 14px; color: #fff; }
+    .trip-completion-item .sub-info { font-size: 11px; color: #64748b; margin-top: 3px; }
+    .trip-completion-item .bar-wrap { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+    .trip-completion-item .bar-wrap .fill {
+        height: 100%; background: linear-gradient(90deg, #10b981, #22c55e); border-radius: 4px; transition: width 1s ease;
+    }
+    .trip-completion-item .bar-wrap.no-plan { background: rgba(255,255,255,0.05); }
+    .trip-completion-item .bar-wrap.no-plan .fill { background: #64748b; width: 100% !important; opacity: 0.4; }
+    .trip-completion-item .pct { font-size: 16px; font-weight: 700; color: #10b981; text-align: center; }
+    .trip-completion-item .pct.no-plan { color: #64748b; font-size: 12px; font-weight: 500; }
+
+    /* --- 空状态 --- */
+    .empty { color: #475569; font-size: 13px; text-align: center; padding: 20px; }
+    .login-tip {
+        text-align: center; padding: 70px 20px; background: rgba(255,255,255,0.04);
+        border: 1px dashed rgba(255,255,255,0.15); border-radius: 16px;
+    }
+    .login-tip .icon { font-size: 44px; margin-bottom: 14px; }
+    .login-tip p { color: #94a3b8; margin-bottom: 20px; font-size: 15px; }
+    .status-bar {
+        position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+        background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.12);
+        color: #e2e8f0; padding: 10px 22px; border-radius: 30px; font-size: 13px;
+        display: none; z-index: 200; backdrop-filter: blur(8px);
+    }
+    .status-bar.show { display: block; animation: fadeIn .2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%); } }
+</style>
+</head>
+<body>
+<div class="topbar">
+    <div class="logo">🌍 国际旅游规划<span>助手</span></div>
+    <div class="nav">
+        <a href="/">🗺️ 地图</a>
+        <a href="/pages/trips.html">🗂️ 我的行程</a>
+        <a href="/pages/planner.html">📋 规划工作台</a>
+        <a href="/pages/dashboard.html" class="active">📊 统计看板</a>
+        <a href="/pages/notes.html">📖 游记广场</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-head">
+        <h2>📊 统计看板</h2>
+        <div class="sub">基于真实有效数据的旅行质量评估 · 抗刷版</div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" id="tabMy" onclick="switchTab('mine')">👤 我的数据</button>
+        <button class="tab" id="tabGlobal" onclick="switchTab('global')">🌐 全局数据</button>
+    </div>
+
+    <div id="loginTip" style="display:none;">
+        <div class="login-tip">
+            <div class="icon">🔐</div>
+            <p>登录后查看你的个人旅行统计数据</p>
+            <a class="btn" href="/pages/login.html" style="padding:10px 22px;border-radius:10px;background:linear-gradient(135deg,#4a9eff,#2563eb);color:#fff;text-decoration:none;font-size:14px;font-weight:600;">前往登录</a>
+        </div>
+    </div>
+
+    <!-- ============ 我的数据 ============ -->
+    <div id="myPanel">
+        <!-- 第一行：抗刷核心指标 -->
+        <div class="stat-grid" id="myStatsGrid"></div>
+
+        <!-- 第二行：国家覆盖 -->
+        <div class="panel"><h3>📍 覆盖国家 Top <span class="hint">（按有效批注/路线数量）</span></h3><div id="myCountryBars"></div></div>
+
+        <!-- 第三行：行程完成度 -->
+        <div class="panel">
+            <h3>📈 行程规划完成度 <span class="hint">有 📋 标记 = 已在 Planner 生成过规划</span></h3>
+            <div id="myCompletion"></div>
+        </div>
+    </div>
+
+    <!-- ============ 全局数据 ============ -->
+    <div id="globalPanel" style="display:none;">
+        <div class="stat-grid" id="globalStatsGrid"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div class="panel"><h3>🔥 热门规划国家</h3><div id="globalCountryBars"></div></div>
+            <div class="panel"><h3>📖 最新公开游记</h3><div id="globalNotes"></div></div>
+        </div>
+    </div>
+</div>
+
+<div class="status-bar" id="statusBar"></div>
+
+<script>
+    function toast(msg) {
+        const el = document.getElementById('statusBar');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(el._t);
+        el._t = setTimeout(() => el.classList.remove('show'), 2000);
+    }
+
+    let currentTab = 'mine';
+    let myData = null;
+
+    function switchTab(tab) {
+        currentTab = tab;
+        document.getElementById('tabMy').classList.toggle('active', tab === 'mine');
+        document.getElementById('tabGlobal').classList.toggle('active', tab === 'global');
+        document.getElementById('myPanel').style.display = tab === 'mine' ? '' : 'none';
+        document.getElementById('globalPanel').style.display = tab === 'global' ? '' : 'none';
+        if (tab === 'mine' && API.isLoggedIn()) loadMyStats();
+        if (tab === 'global') loadGlobalStats();
+    }
+
+    function statCard(icon, label, num, sub, extraClass) {
+        return `<div class="stat-card ${extraClass || ''}">
+            <div class="icon">${icon}</div>
+            <div class="num">${num}</div>
+            <div class="label">${label}</div>
+            ${sub ? `<div class="sub">${sub}</div>` : ''}
+        </div>`;
+    }
+
+    function progressCard(icon, label, pct, current, total) {
+        return `<div class="stat-card progress-card">
+            <div class="icon" style="text-align:center;">${icon}</div>
+            <div class="num">${pct}%</div>
+            <div class="label">${label}</div>
+            <div class="progress-bg"><div class="progress-fill" style="width:${Math.min(pct,100)}%"></div></div>
+            <div class="sub">${current} / ${total}</div>
+        </div>`;
+    }
+
+    function renderBars(el, items, max) {
+        if (!items || items.length === 0) { el.innerHTML = '<div class="empty">暂无数据</div>'; return; }
+        max = max || Math.max(...items.map(i => i.cnt || i.count || 0), 1);
+        el.innerHTML = items.map(i => {
+            const name = i.country_name || i.country_zh || i.name || '未知';
+            const cnt = i.cnt || i.count || 0;
+            const pct = Math.round(cnt / max * 100);
+            return `<div class="bar-item"><div class="name">${name}</div><div class="bar-bg"><div class="bar" style="width:${pct}%"></div></div><div class="cnt">${cnt}</div></div>`;
+        }).join('');
+    }
+
+    // ========== 我的数据 ==========
+    async function loadMyStats() {
+        const res = await API.myStats();
+        if (res.code !== 0) { if (res.msg) toast(res.msg); return; }
+        const d = res.data;
+        myData = d;
+
+        // --- 指标卡 ---
+        document.getElementById('myStatsGrid').innerHTML =
+            statCard('🗺️', '有效行程', `${d.effective_trip_count}`, `/ ${d.trip_count} 总行程`) +
+            statCard('📌', '有效批注', `${d.effective_annotation_count}`, '/ 有内容的标记') +
+            statCard('🛤️', '有效路线', `${d.effective_route_count}`, '/ 有里程的路线') +
+            statCard('📏', '累计里程', `${d.effective_distance.toLocaleString()} km`, '几何计算，无法伪造') +
+            progressCard('🌍', '全球覆盖', d.country_progress_pct, d.country_count, d.global_country_total);
+
+        // --- 国家 Top ---
+        renderBars(document.getElementById('myCountryBars'), d.country_stats);
+
+        // --- 行程完成度 ---
+        loadTripCompletion();
+    }
+
+    async function loadTripCompletion() {
+        const res = await API.tripCompletion();
+        if (res.code !== 0) return;
+        const items = res.data;
+        if (!items || items.length === 0) {
+            document.getElementById('myCompletion').innerHTML = '<div class="empty">还没有任何行程</div>';
+            return;
+        }
+        document.getElementById('myCompletion').innerHTML = items.map(row => {
+            const hasPlan = row.has_plan;
+            const pct = row.completion_pct;
+            return `
+            <div class="trip-completion-item">
+                <div>
+                    <div class="tname">${row.trip_name} ${hasPlan ? '📋' : ''}</div>
+                    <div class="sub-info">
+                        📌 ${row.actual_annotations} 批注 · 🛤️ ${row.actual_routes} 路线 · 📏 ${row.actual_distance} km
+                        ${hasPlan ? ` · 📋 ${row.plan_total_days}天/${row.plan_total_sights}景点` : ''}
+                    </div>
+                </div>
+                <div class="bar-wrap ${hasPlan ? '' : 'no-plan'}">
+                    <div class="fill" style="width:${pct || 40}%"></div>
+                </div>
+                <div class="pct ${hasPlan ? '' : 'no-plan'}">${hasPlan ? pct + '%' : '未规划'}</div>
+            </div>`;
+        }).join('');
+    }
+
+    // ========== 全局数据 ==========
+    async function loadGlobalStats() {
+        const res = await API.globalStats();
+        if (res.code !== 0) { toast(res.msg || '加载失败'); return; }
+        const d = res.data;
+        document.getElementById('globalStatsGrid').innerHTML =
+            statCard('👥', '注册用户', d.user_count) +
+            statCard('🏙️', '收录城市', d.city_count) +
+            statCard('🌍', '覆盖国家', d.country_count) +
+            statCard('📌', '有效批注', d.annotation_count, '有内容') +
+            statCard('🛤️', '有效路线', d.route_count, '有里程') +
+            statCard('📖', '公开游记', d.note_count);
+        renderBars(document.getElementById('globalCountryBars'), d.top_countries);
+        const notesEl = document.getElementById('globalNotes');
+        if (!d.recent_notes || d.recent_notes.length === 0) {
+            notesEl.innerHTML = '<div class="empty">暂无公开游记</div>';
+        } else {
+            notesEl.innerHTML = d.recent_notes.map(n => `
+                <div style="padding:12px;background:rgba(255,255,255,0.04);border-radius:8px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.06);">
+                    <div style="font-size:14px;color:#fff;">${n.title}</div>
+                    <div style="font-size:11px;color:#64748b;margin-top:3px;">✍️ ${n.nickname || '匿名'} · 👁️ ${n.view_count || 0} 次浏览</div>
+                </div>`).join('');
+        }
+    }
+
+    // 初始化
+    if (API.isLoggedIn()) {
+        loadMyStats();
+    } else {
+        document.getElementById('loginTip').style.display = '';
+        document.getElementById('myPanel').style.display = 'none';
+    }
+    loadGlobalStats();
+</script>
+</body>
+</html>
