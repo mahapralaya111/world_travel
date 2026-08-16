@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>行程 · 离线查看</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+           background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+    .topbar { display: flex; align-items: center; justify-content: space-between;
+              padding: 14px 18px; background: rgba(255,255,255,0.05);
+              border-bottom: 1px solid rgba(255,255,255,0.08); position: sticky; top: 0;
+              backdrop-filter: blur(8px); z-index: 10; }
+    .topbar .title { font-size: 15px; font-weight: 700; color: #fff; overflow: hidden;
+                     text-overflow: ellipsis; white-space: nowrap; margin-right: 10px; }
+    .topbar .offline-tag { font-size: 11px; padding: 3px 10px; border-radius: 20px;
+                           background: rgba(123,216,143,0.15); color: #7bd88f; flex-shrink: 0; }
+    .container { max-width: 720px; margin: 0 auto; padding: 16px 14px 70px; }
+    .loading { text-align: center; padding: 80px 20px; color: #64748b; font-size: 14px; }
+    .spinner { width: 34px; height: 34px; border: 3px solid rgba(74,158,255,0.2);
+               border-top-color: #4a9eff; border-radius: 50%; margin: 0 auto 16px; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .summary { background: linear-gradient(135deg, rgba(74,158,255,0.12), rgba(156,39,176,0.10));
+               border: 1px solid rgba(74,158,255,0.25); border-radius: 12px; padding: 14px;
+               font-size: 13px; line-height: 1.7; margin-bottom: 14px; }
+    .dest-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .dest-chip { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+                 padding: 6px 12px; border-radius: 20px; font-size: 12px; color: #cbd5e1; }
+    .dest-chip b { color: #fff; }
+    .day-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+                border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+    .day-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .day-badge { background: linear-gradient(135deg, #4a9eff, #2563eb); color: #fff;
+                 font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 8px; }
+    .day-city { font-size: 12px; color: #94a3b8; }
+    .day-theme { font-size: 12px; color: #4a9eff; margin-bottom: 10px; }
+    .act { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.08); }
+    .act:last-child { border-bottom: none; }
+    .act-time { width: 48px; flex-shrink: 0; font-size: 12px; color: #94a3b8; padding-top: 2px; }
+    .act-body { flex: 1; }
+    .act-name { font-size: 14px; color: #fff; font-weight: 600; }
+    .act-meta { font-size: 11px; color: #64748b; margin-top: 3px; }
+    .act-cost { font-size: 12px; color: #fbbf24; margin-top: 3px; }
+    .day-tips { font-size: 12px; color: #7bd88f; background: rgba(123,216,143,0.08);
+                border-radius: 8px; padding: 8px 10px; margin-top: 10px; }
+    .intents { margin-top: 14px; }
+    .intents h4 { font-size: 14px; margin-bottom: 8px; }
+    .intent-tag { display: inline-block; background: rgba(156,39,176,0.15); color: #d8b4fe;
+                  border: 1px solid rgba(156,39,176,0.3); font-size: 11px; padding: 3px 10px;
+                  border-radius: 20px; margin: 3px; }
+    .footer { text-align: center; color: #475569; font-size: 11px; margin-top: 22px; }
+    .error-box { text-align: center; padding: 60px 20px; color: #f87171; font-size: 14px; }
+    .map-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+                border-radius: 14px; padding: 16px; margin-top: 14px; }
+    .map-card h4 { font-size: 14px; margin-bottom: 10px; }
+    .map-box { width: 100%; height: auto; display: block; background: rgba(15,23,42,0.65);
+               border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; }
+    .md-item { display: flex; gap: 10px; padding: 8px 0;
+               border-bottom: 1px dashed rgba(255,255,255,0.08); font-size: 13px; }
+    .md-item:last-child { border-bottom: none; }
+    .md-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .md-line { width: 22px; height: 4px; border-radius: 2px; flex-shrink: 0; margin-top: 8px; }
+    .md-body { flex: 1; min-width: 0; }
+    .md-name { color: #fff; font-weight: 600; }
+    .md-sub { color: #64748b; font-size: 11px; margin-top: 2px; word-break: break-all; }
+</style>
+</head>
+<body>
+<div class="topbar">
+    <div class="title" id="pageTitle">行程 · 离线查看</div>
+    <span class="offline-tag">离线包</span>
+</div>
+<div class="container" id="app">
+    <div class="loading"><div class="spinner"></div>正在加载行程...</div>
+</div>
+<div class="footer">国际旅游规划助手 · 离线行程</div>
+
+<script>
+(function() {
+    var app = document.getElementById('app');
+    var pageTitle = document.getElementById('pageTitle');
+    var rts = [], anns = [];  // 地图标注数据（renderPlan 填充，drawMapSvg 绘制）
+    var esc = function(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+
+    function renderPlan(plan) {
+        pageTitle.textContent = (plan.meta && plan.meta.title) || '行程 · 离线查看';
+        var h = [];
+        if (plan.summary) h.push('<div class="summary">' + esc(plan.summary) + '</div>');
+
+        if (plan.destinations && plan.destinations.length) {
+            h.push('<div class="dest-list">');
+            plan.destinations.forEach(function(d) {
+                h.push('<div class="dest-chip"><b>' + esc(d.city) + '</b> · ' + esc(d.country || '') +
+                       ' · ' + d.days + ' 天</div>');
+            });
+            h.push('</div>');
+        }
+
+        (plan.days || []).forEach(function(day) {
+            h.push('<div class="day-card">');
+            h.push('<div class="day-head"><span class="day-badge">Day ' + day.day + '</span>' +
+                   '<span class="day-city">' + esc(day.date) + ' · ' + esc(day.city) + '</span></div>');
+            if (day.theme) h.push('<div class="day-theme">主题：' + esc(day.theme) + '</div>');
+            (day.activities || []).forEach(function(a) {
+                var typeLabel = {sight:'景点', food:'美食', transport:'交通', hotel:'住宿', free:'自由'}[a.type] || '活动';
+                h.push('<div class="act">');
+                h.push('<div class="act-time">' + esc(a.time) + '</div>');
+                h.push('<div class="act-body"><div class="act-name">' + esc(a.name) + '</div>');
+                h.push('<div class="act-meta">' + typeLabel + (a.transport ? ' · ' + esc(a.transport) : '') + '</div>');
+                if (a.cost) h.push('<div class="act-cost">约 ¥' + esc(a.cost) + '</div>');
+                h.push('</div></div>');
+            });
+            if (day.tips) h.push('<div class="day-tips">💡 ' + esc(day.tips) + '</div>');
+            h.push('</div>');
+        });
+
+        if (plan.intents && plan.intents.length) {
+            h.push('<div class="intents"><h4>📝 已应用的调整</h4>');
+            plan.intents.forEach(function(t) { h.push('<span class="intent-tag">' + esc(t) + '</span>'); });
+            h.push('</div>');
+        }
+
+        // 地图标注（路线 + 批注）
+        var md = plan.map_data || {};
+        rts = (md.routes || []).filter(function(r) { return r && (r.points || []).length >= 2; });
+        anns = (md.annotations || []).filter(function(a) { return a && (a.lat || a.lng); });
+        if (rts.length || anns.length) {
+            h.push('<div class="map-card"><h4>🗺️ 地图标注</h4>' +
+                   '<svg id="mapSvg" class="map-box" viewBox="0 0 640 380" preserveAspectRatio="xMidYMid meet"></svg>');
+            if (rts.length) {
+                h.push('<div style="margin-top:10px">');
+                rts.forEach(function(r) {
+                    h.push('<div class="md-item"><span class="md-line" style="background:' + esc(r.color || '#4a9eff') + '"></span>' +
+                           '<div class="md-body"><div class="md-name">' + esc(r.name || '未命名路线') + '</div>' +
+                           '<div class="md-sub">' + esc(r.country_name || '') +
+                           (r.distance ? (r.country_name ? ' · ' : '') + '约 ' + esc(r.distance) + ' km' : '') +
+                           ' · ' + r.points.length + ' 个点</div></div></div>');
+                });
+                h.push('</div>');
+            }
+            if (anns.length) {
+                h.push('<div style="margin-top:10px">');
+                anns.forEach(function(a) {
+                    h.push('<div class="md-item"><span class="md-dot" style="background:' + esc(a.color || '#ff5252') + '"></span>' +
+                           '<div class="md-body"><div class="md-name">' + esc(a.title) + '</div>' +
+                           (a.content ? '<div class="md-sub">' + esc(a.content) + '</div>' : '') + '</div></div>');
+                });
+                h.push('</div>');
+            }
+            h.push('</div>');
+        }
+
+        app.innerHTML = h.join('');
+        drawMapSvg();
+    }
+
+    // 简易标注示意图（等距圆柱投影，纯 SVG，离线可用）
+    function drawMapSvg() {
+        var svg = document.getElementById('mapSvg');
+        if (!svg || (!rts.length && !anns.length)) return;
+        // 跨 180° 经线的路线先做经度解卷，避免横穿整幅图
+        rts.forEach(function(r) {
+            var prev = null;
+            r.points = r.points.map(function(p) {
+                var lng = +p.lng;
+                if (prev != null) {
+                    while (lng - prev > 180) lng -= 360;
+                    while (lng - prev < -180) lng += 360;
+                }
+                prev = lng;
+                return { lat: +p.lat, lng: lng };
+            });
+        });
+        var pts = [];
+        anns.forEach(function(a) { pts.push([+a.lat, +a.lng]); });
+        rts.forEach(function(r) { r.points.forEach(function(p) { pts.push([p.lat, p.lng]); }); });
+        if (!pts.length) return;
+        var W = 640, H = 380, pad = 34;
+        var lat0 = pts[0][0], lng0 = pts[0][1];
+        var minLat = lat0, maxLat = lat0, minLng = lng0, maxLng = lng0;
+        pts.forEach(function(p) {
+            if (p[0] < minLat) minLat = p[0]; if (p[0] > maxLat) maxLat = p[0];
+            if (p[1] < minLng) minLng = p[1]; if (p[1] > maxLng) maxLng = p[1];
+        });
+        var kx = Math.cos((minLat + maxLat) / 2 * Math.PI / 180) || 0.0001;
+        var xs = [], ys = [];
+        pts.forEach(function(p) { xs.push((p[1] - lng0) * kx); ys.push(lat0 - p[0]); });
+        var minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs);
+        var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
+        var s = Math.min((W - 2 * pad) / ((maxX - minX) || 0.0001), (H - 2 * pad) / ((maxY - minY) || 0.0001));
+        var ox = (W - (maxX - minX) * s) / 2, oy = (H - (maxY - minY) * s) / 2;
+        var project = function(lat, lng) {
+            return [ox + ((lng - lng0) * kx - minX) * s, oy + ((lat0 - lat) - minY) * s];
+        };
+        var sh = [];
+        rts.forEach(function(r) {
+            var d = r.points.map(function(p, i) {
+                var q = project(p.lat, p.lng);
+                return (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1);
+            }).join(' ');
+            sh.push('<path d="' + d + '" fill="none" stroke="' + esc(r.color || '#4a9eff') +
+                    '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.9"/>');
+            var q0 = project(r.points[0].lat, r.points[0].lng);
+            sh.push('<circle cx="' + q0[0].toFixed(1) + '" cy="' + q0[1].toFixed(1) + '" r="3.5" fill="' +
+                    esc(r.color || '#4a9eff') + '" stroke="#fff" stroke-width="1.2"/>');
+        });
+        anns.forEach(function(a) {
+            var q = project(+a.lat, +a.lng);
+            sh.push('<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="5" fill="' +
+                    esc(a.color || '#ff5252') + '" stroke="#fff" stroke-width="1.5"/>');
+            if (a.title) sh.push('<text x="' + q[0].toFixed(1) + '" y="' + (q[1] - 9).toFixed(1) +
+                    '" text-anchor="middle" font-size="11" fill="#e2e8f0">' + esc(a.title) + '</text>');
+        });
+        svg.innerHTML = sh.join('');
+    }
+
+    // 数据来源优先级：
+    // 1. #trip:xxx（zlib+base64 压缩序列化，可离线）
+    // 2. ?trip_id=xx（在线拉取）
+    var hash = decodeURIComponent(location.hash || '').replace(/^#/, '');
+    var q = new URLSearchParams(location.search);
+
+    if (hash.indexOf('trip:') === 0) {
+        (async function() {
+            var b64 = hash.slice(5);
+            try {
+                // ====== 本地 raw-deflate + base64 解压（完全离线，零依赖）======
+                // 后端: Python zlib.compressobj(wbits=-15)  → raw deflate bytes → base64.urlsafe
+                // 前端: urlsafe_b64 → bytes → DecompressionStream('deflate-raw') → JSON.parse
+                var stdB64 = b64.replace(/-/g, '+').replace(/_/g, '/');
+                while (stdB64.length % 4) stdB64 += '=';
+                var binary = atob(stdB64);
+                var bytes = new Uint8Array(binary.length);
+                for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+                // raw deflate 格式，浏览器原生 deflate-raw 直接解，无 header/checksum 需跳过
+                var ds = new DecompressionStream('deflate-raw');
+                var reader = new Blob([bytes]).stream().pipeThrough(ds).getReader();
+                var chunks = [];
+                var totalLen = 0;
+                while (true) {
+                    var r = await reader.read();
+                    if (r.done) break;
+                    chunks.push(r.value);
+                    totalLen += r.value.length;
+                }
+                var merged = new Uint8Array(totalLen);
+                var off = 0;
+                chunks.forEach(function(c) { merged.set(c, off); off += c.length; });
+                var planJson = new TextDecoder('utf-8').decode(merged);
+                var plan = JSON.parse(planJson);
+                renderPlan(plan);
+            } catch (localErr) {
+                // 本地解压失败 → 回退服务器（老格式 / 浏览器旧版无 DecompressionStream）
+                try {
+                    var r2 = await fetch('/api/plan/offline/decode?data=' + encodeURIComponent(b64), {method: 'GET'});
+                    var res = await r2.json();
+                    if (res.code === 0 && res.data) { renderPlan(res.data); }
+                    else { app.innerHTML = '<div class="error-box">离线数据解析失败</div>'; }
+                } catch (fetchErr) {
+                    app.innerHTML = '<div class="error-box">离线数据解析失败（需要服务器环境）<br><small style="opacity:.6">' + esc(localErr.message) + '</small></div>';
+                }
+            }
+        })();
+        return;
+    }
+
+    if (q.get('trip_id')) {
+        fetch('/api/trips/' + q.get('trip_id') + '/plan', {credentials: 'include'})
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (res.code === 0 && res.data) { renderPlan(res.data); }
+                else { app.innerHTML = '<div class="error-box">行程不存在或已被删除</div>'; }
+            })
+            .catch(function() { app.innerHTML = '<div class="error-box">网络错误，无法加载行程</div>'; });
+        return;
+    }
+
+    // 无参数：展示空白提示
+    app.innerHTML = '<div class="error-box">请在离线包或带 trip_id 的链接中打开此页面</div>';
+})();
+</script>
+</body>
+</html>
