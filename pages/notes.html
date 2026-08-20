@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游记广场 - 国际旅游规划助手</title>
+<script src="/static/js/api.js"></script>
+<!-- Leaflet 用于内嵌地图预览 -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        min-height: 100vh; background: #0f172a; color: #e2e8f0;
+    }
+    .topbar {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 28px; background: rgba(255,255,255,0.04);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px);
+    }
+    .topbar .logo { font-size: 18px; font-weight: 800; color: #fff; }
+    .topbar .logo span { color: #4a9eff; }
+    .topbar .nav a {
+        color: #94a3b8; text-decoration: none; font-size: 13px; margin-left: 18px;
+        padding: 6px 12px; border-radius: 8px; transition: all .2s ease;
+    }
+    .topbar .nav a:hover, .topbar .nav a.active { color: #fff; background: rgba(74,158,255,0.15); }
+    .container { max-width: 1000px; margin: 0 auto; padding: 30px 28px 60px; }
+    .page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; }
+    .page-head h2 { font-size: 22px; }
+    .page-head .sub { color: #64748b; font-size: 13px; margin-top: 4px; }
+    .search-row { display: flex; gap: 10px; }
+    .search-row input {
+        padding: 10px 16px; background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(255,255,255,0.13); border-radius: 10px; color: #fff;
+        font-size: 14px; outline: none; width: 240px;
+    }
+    .search-row input:focus { border-color: #4a9eff; }
+    .search-row button {
+        padding: 10px 20px; background: linear-gradient(135deg, #4a9eff, #2563eb);
+        color: #fff; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600;
+    }
+    .btn {
+        padding: 10px 22px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+        cursor: pointer; transition: all .2s ease; background: linear-gradient(135deg, #4a9eff, #2563eb);
+        color: #fff; text-decoration: none; display: inline-block;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(74,158,255,0.35); }
+    .btn.ghost { background: rgba(255,255,255,0.08); color: #cbd5e1; }
+    .btn.danger { background: rgba(255,82,82,0.12); color: #ff6b6b; }
+
+    .note-list { display: flex; flex-direction: column; gap: 16px; }
+    .note-card {
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 16px; padding: 22px; cursor: pointer; transition: all .2s ease;
+    }
+    .note-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
+    .note-card .n-title { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .note-card .n-content {
+        font-size: 14px; color: #94a3b8; line-height: 1.7; max-height: 72px; overflow: hidden;
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    }
+    .note-card .n-meta { display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: #64748b; flex-wrap: wrap; }
+    .note-card .n-actions { display: flex; gap: 10px; margin-top: 12px; }
+
+    .empty { text-align: center; color: #475569; padding: 60px 0; }
+
+    /* Modal */
+    .modal-mask {
+        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+        z-index: 100; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-mask.show { display: flex; }
+    .modal {
+        width: 100%; max-width: 640px; max-height: 88vh; overflow-y: auto;
+        background: #1e293b; border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px; padding: 26px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .modal h3 { color: #fff; font-size: 17px; margin-bottom: 20px; }
+    .modal .form-group { margin-bottom: 14px; }
+    .modal .form-group label { display: block; color: #cbd5e1; font-size: 13px; margin-bottom: 6px; }
+    .modal .form-group input, .modal .form-group textarea {
+        width: 100%; padding: 10px 12px; background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(255,255,255,0.13); border-radius: 8px; color: #fff;
+        font-size: 14px; outline: none; font-family: inherit;
+    }
+    .modal .form-group input:focus, .modal .form-group textarea:focus { border-color: #4a9eff; }
+    .modal .form-group textarea { resize: vertical; min-height: 180px; line-height: 1.6; }
+    .modal .form-group .check { display: flex; align-items: center; gap: 8px; }
+    .modal .form-group .check input { width: auto; }
+    .modal .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .status-bar {
+        position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+        background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.12);
+        color: #e2e8f0; padding: 10px 22px; border-radius: 30px; font-size: 13px;
+        display: none; z-index: 200; backdrop-filter: blur(8px);
+    }
+    .status-bar.show { display: block; animation: fadeIn .2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%); } }
+    .pager { display: flex; justify-content: center; gap: 14px; margin-top: 28px; align-items: center; }
+    .pager button {
+        padding: 8px 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
+        background: rgba(255,255,255,0.05); color: #cbd5e1; cursor: pointer; font-size: 13px;
+    }
+    .pager button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .pager .info { color: #64748b; font-size: 13px; }
+
+    /* 徽章 */
+    .badge {
+        display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px;
+        background: rgba(74,158,255,0.15); color: #60a5fa; font-weight: 600;
+    }
+    .trip-info-box {
+        background: rgba(74,158,255,0.1); border: 1px solid rgba(74,158,255,0.25);
+        border-radius: 10px; padding: 12px 16px; margin-top: 12px;
+        font-size: 13px; color: #93c5fd; display: flex; align-items: center; gap: 12px;
+        flex-wrap: wrap;
+    }
+    .trip-info-box .stat { font-weight: 600; color: #bfdbfe; }
+
+    /* --- 内嵌地图预览 --- */
+    .share-preview {
+        margin-top: 16px; border-radius: 12px; overflow: hidden;
+        border: 1px solid rgba(74,158,255,0.25);
+        background: #1e293b;
+    }
+    .share-preview-header {
+        display: flex; align-items: center; gap: 14px;
+        padding: 10px 16px; background: rgba(74,158,255,0.1);
+        font-size: 13px; color: #93c5fd; flex-wrap: wrap;
+    }
+    .share-preview-header .dot { width: 8px; height: 8px; border-radius: 50%; background: #60a5fa; }
+    .share-preview-header .stat-num { font-weight: 700; color: #bfdbfe; }
+    #notePreviewMap { height: 340px; position: relative; z-index: 1; filter: brightness(0.78) contrast(1.1) saturate(0.9); }
+    .leaflet-control-attribution { background: rgba(0,0,0,0.5) !important; color: #94a3b8 !important; }
+    .leaflet-control-attribution a { color: #60a5fa !important; }
+
+    .share-preview-actions {
+        display: flex; gap: 10px; padding: 12px 16px;
+        background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .btn { padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px;
+        background: linear-gradient(135deg,#4a9eff,#2563eb); color: #fff; font-weight: 600;
+        transition: all .2s; }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(74,158,255,0.3); }
+    .btn.ghost { background: rgba(255,255,255,0.08); color: #cbd5e1; }
+    .btn.ghost:hover { background: rgba(255,255,255,0.15); transform: none; box-shadow: none; }
+</style>
+</head>
+<body>
+<div class="topbar">
+    <div class="logo">🌍 国际旅游规划<span>助手</span></div>
+    <div class="nav">
+        <a href="/">🗺️ 地图</a>
+        <a href="/pages/trips.html">🗂️ 我的行程</a>
+        <a href="/pages/dashboard.html">📊 统计看板</a>
+        <a href="/pages/notes.html" class="active">📖 游记广场</a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-head">
+        <div>
+            <h2>📖 游记广场</h2>
+            <div class="sub">分享你的旅行故事，浏览大家的精彩旅程</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+            <div class="search-row">
+                <input type="text" id="searchInput" placeholder="搜索游记标题/内容..." onkeydown="if(event.key==='Enter')loadNotes(1)">
+                <button onclick="loadNotes(1)">搜索</button>
+            </div>
+            <button class="btn" onclick="openWriteModal()">✍️ 写游记</button>
+        </div>
+    </div>
+
+    <div id="noteList" class="note-list"></div>
+    <div class="pager" id="pager" style="display:none;">
+        <button id="prevBtn" onclick="loadNotes(currentPage-1)">← 上一页</button>
+        <span class="info" id="pageInfo"></span>
+        <button id="nextBtn" onclick="loadNotes(currentPage+1)">下一页 →</button>
+    </div>
+</div>
+
+<!-- 写游记弹窗 -->
+<div class="modal-mask" id="modal">
+    <div class="modal">
+        <h3 id="modalTitle">✍️ 写游记</h3>
+        <div class="form-group">
+            <label>标题 *</label>
+            <input type="text" id="f_title" placeholder="如：追寻极光之旅">
+        </div>
+        <div class="form-group">
+            <label>关联行程（可选）</label>
+            <select id="f_trip"></select>
+        </div>
+        <div class="form-group">
+            <label>内容 *</label>
+            <textarea id="f_content" placeholder="写下你的旅行见闻、攻略与感悟..."></textarea>
+        </div>
+        <div class="form-group">
+            <label class="check"><input type="checkbox" id="f_public" checked> 公开发布（所有人可见）</label>
+        </div>
+        <div class="actions">
+            <button class="btn ghost" onclick="closeModal()">取消</button>
+            <button class="btn" onclick="saveNote()">发布</button>
+        </div>
+    </div>
+</div>
+
+<!-- 导入路线弹窗 -->
+<div class="modal-mask" id="importModal">
+    <div class="modal">
+        <h3>📥 导入游记中的路线与批注</h3>
+        <div id="importMeta" style="color:#94a3b8;font-size:13px;margin-bottom:14px;"></div>
+        <div class="form-group">
+            <label>导入到我的行程</label>
+            <select id="imp_trip"></select>
+        </div>
+        <div class="form-group">
+            <label class="check">
+                <input type="radio" name="imp_mode" value="merge" checked> 合并到现有数据
+            </label>
+            <label class="check" style="margin-top:4px;">
+                <input type="radio" name="imp_mode" value="replace"> 替换目标行程中同国家的批注/路线
+            </label>
+        </div>
+        <div class="actions">
+            <button class="btn ghost" onclick="closeImportModal()">取消</button>
+            <button class="btn" onclick="doImport()">确认导入</button>
+        </div>
+    </div>
+</div>
+
+<div class="status-bar" id="statusBar"></div>
+
+<script>
+    let currentPage = 1;
+    let editingId = null;
+    let currentViewingNote = null;  // 当前详情页的游记数据
+    let currentShareInfo = null;     // 当前游记关联的 share 详情
+    const SIZE = 6;
+
+    function toast(msg) {
+        const el = document.getElementById('statusBar');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(el._t);
+        el._t = setTimeout(() => el.classList.remove('show'), 2000);
+    }
+
+    function escapeHtml(s) {
+        return String(s || '').replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[c]);
+    }
+
+    function fmtDate(s) {
+        if (!s) return '';
+        return String(s).replace('T', ' ').slice(0, 16);
+    }
+
+    async function loadNotes(page) {
+        page = page || 1;
+        const q = document.getElementById('searchInput').value.trim();
+        const res = await API.listNotes({ page, size: SIZE, q });
+        if (res.code !== 0) { toast(res.msg || '加载失败'); return; }
+        const d = res.data;
+        currentPage = d.page || 1;
+        const list = document.getElementById('noteList');
+        if (!d.items || d.items.length === 0) {
+            list.innerHTML = '<div class="empty">暂无游记，来写第一篇吧 ✨</div>';
+            document.getElementById('pager').style.display = 'none';
+            return;
+        }
+        list.innerHTML = d.items.map(n => {
+            const isMine = API.isLoggedIn() && n.user_id === (API.user || {}).id;
+            return `
+            <div class="note-card" onclick="viewNote(${n.id})">
+                <div class="n-title">
+                    ${escapeHtml(n.title)}
+                    ${n.share_token ? '<span class="badge" style="margin-left:8px;">🗺️ 含路线地图</span>' : ''}
+                </div>
+                <div class="n-content">${escapeHtml(n.content)}</div>
+                <div class="n-meta">
+                    <span>✍️ ${escapeHtml(n.nickname || n.username || '匿名')}</span>
+                    <span>👁️ ${n.view_count} 次浏览</span>
+                    ${n.trip_name ? `<span>🗂️ ${escapeHtml(n.trip_name)}</span>` : ''}
+                    <span>🕐 ${fmtDate(n.created_at)}</span>
+                    ${!n.is_public ? '<span style="color:#fbbf24;">🔒 私有</span>' : ''}
+                </div>
+                ${isMine ? `
+                <div class="n-actions" onclick="event.stopPropagation()">
+                    <button class="btn ghost" onclick="openEditModal(${n.id})">编辑</button>
+                    <button class="btn danger" onclick="removeNote(${n.id})">删除</button>
+                </div>` : ''}
+            </div>`;
+        }).join('');
+        const totalPages = Math.max(1, Math.ceil(d.total / SIZE));
+        document.getElementById('pager').style.display = 'flex';
+        document.getElementById('pageInfo').textContent = `第 ${currentPage} / ${totalPages} 页`;
+        document.getElementById('prevBtn').disabled = currentPage <= 1;
+        document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+    }
+
+    async function loadTripOptions(selectedId) {
+        const sel = document.getElementById('f_trip');
+        if (!API.isLoggedIn()) {
+            sel.innerHTML = '<option value="">请先登录</option>';
+            return;
+        }
+        const res = await API.listTrips();
+        const trips = (res.code === 0 && res.data) ? res.data : [];
+        sel.innerHTML = '<option value="">— 不关联行程 —</option>' + trips.map(t =>
+            `<option value="${t.id}" ${String(t.id) === String(selectedId) ? 'selected' : ''}>${escapeHtml(t.name)}</option>`).join('');
+    }
+
+    function openWriteModal() {
+        if (!API.isLoggedIn()) {
+            toast('请先登录后再写游记');
+            setTimeout(() => location.href = '/pages/login.html', 800);
+            return;
+        }
+        editingId = null;
+        document.getElementById('modalTitle').textContent = '✍️ 写游记';
+        document.getElementById('f_title').value = '';
+        document.getElementById('f_content').value = '';
+        document.getElementById('f_public').checked = true;
+        loadTripOptions('');
+        document.getElementById('modal').classList.add('show');
+    }
+
+    async function openEditModal(id) {
+        const res = await API.getNote(id);
+        if (res.code !== 0) { toast('无法加载该游记'); return; }
+        const n = res.data;
+        editingId = id;
+        document.getElementById('modalTitle').textContent = '✏️ 编辑游记';
+        document.getElementById('f_title').value = n.title;
+        document.getElementById('f_content').value = n.content;
+        document.getElementById('f_public').checked = !!n.is_public;
+        loadTripOptions(n.trip_id);
+        document.getElementById('modal').classList.add('show');
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.remove('show');
+    }
+
+    async function saveNote() {
+        const title = document.getElementById('f_title').value.trim();
+        const content = document.getElementById('f_content').value.trim();
+        if (!title) { toast('请输入标题'); return; }
+        if (!content) { toast('请输入内容'); return; }
+        const data = {
+            title,
+            content,
+            trip_id: document.getElementById('f_trip').value || null,
+            is_public: document.getElementById('f_public').checked,
+        };
+        const res = editingId ? await API.updateNote(editingId, data) : await API.createNote(data);
+        if (res.code === 0) {
+            toast(editingId ? '游记已更新' : '游记发布成功');
+            closeModal();
+            loadNotes(1);
+        } else {
+            toast(res.msg || '保存失败');
+        }
+    }
+
+    async function removeNote(id) {
+        if (!confirm('确定删除这篇游记吗？')) return;
+        const res = await API.deleteNote(id);
+        if (res.code === 0) {
+            toast('游记已删除');
+            loadNotes(currentPage);
+        } else {
+            toast(res.msg || '删除失败');
+        }
+    }
+
+    async function viewNote(id) {
+        const res = await API.getNote(id);
+        if (res.code !== 0) { toast('游记不存在或未公开'); return; }
+        const n = res.data;
+        currentViewingNote = n;
+        currentShareInfo = null;
+        const isMine = API.isLoggedIn() && n.user_id === (API.user || {}).id;
+
+        // 如果有 share_token，获取完整预览（含批注/路线坐标）
+        let annCount = 0, rtCount = 0, snapPreview = null, scopeLabel = '';
+        if (n.share_token) {
+            try {
+                const sr = await API.inspectShare(n.share_token);
+                if (sr.code === 0) {
+                    currentShareInfo = sr.data;
+                    annCount = sr.data.annotation_count || 0;
+                    rtCount = sr.data.route_count || 0;
+                    snapPreview = sr.data.preview || { annotations: [], routes: [] };
+                    if (sr.data.scope === 'trip') scopeLabel = '整份行程分享';
+                    else if (sr.data.country_name) scopeLabel = sr.data.country_name + ' · 单国分享';
+                }
+            } catch (e) {}
+        }
+
+        const list = document.getElementById('noteList');
+        list.innerHTML = `
+            <div class="note-card" style="cursor:default;">
+                <div class="n-title" style="font-size:22px;">
+                    ${escapeHtml(n.title)}
+                    ${n.share_token ? '<span class="badge" style="margin-left:8px;">🗺️ 含路线地图</span>' : ''}
+                </div>
+                <div class="n-meta">
+                    <span>✍️ ${escapeHtml(n.nickname || n.username || '匿名')}</span>
+                    ${n.trip_name ? `<span>🗂️ ${escapeHtml(n.trip_name)}</span>` : ''}
+                    <span>👁️ ${n.view_count} 次浏览</span>
+                    <span>🕐 ${fmtDate(n.created_at)}</span>
+                    ${!n.is_public ? '<span style="color:#fbbf24;">🔒 私有</span>' : ''}
+                </div>
+                <div style="margin-top:18px;font-size:14.5px;color:#cbd5e1;line-height:2;white-space:pre-wrap;">${escapeHtml(n.content)}</div>
+
+                ${n.share_token ? `
+                <div class="share-preview">
+                    <div class="share-preview-header">
+                        <span class="dot"></span>
+                        <span><b>🗺️ 地图预览</b></span>
+                        <span>${scopeLabel ? '· ' + scopeLabel : ''}</span>
+                        <span>·</span>
+                        <span><span class="stat-num">${annCount}</span> 批注</span>
+                        <span>·</span>
+                        <span><span class="stat-num">${rtCount}</span> 路线</span>
+                        <span style="margin-left:auto;color:#64748b;font-size:12px;">${escapeHtml(currentShareInfo?.owner || '作者')} 的路线</span>
+                    </div>
+                    <div id="notePreviewMap"></div>
+                    <div class="share-preview-actions">
+                        <button class="btn" onclick="openImportModal()">📥 导入到我的行程</button>
+                        <button class="btn ghost" onclick="viewOnMap()">🗺️ 在大地图上查看</button>
+                        <span style="margin-left:auto;color:#64748b;font-size:11px;align-self:center;">💡 看完觉得适合再决定要不要导入</span>
+                    </div>
+                </div>` : ''}
+
+                <div class="n-actions" style="margin-top:16px;">
+                    ${isMine ? `
+                    <button class="btn ghost" onclick="openEditModal(${n.id})">编辑</button>
+                    <button class="btn danger" onclick="removeNote(${n.id})">删除</button>` : ''}
+                    <button class="btn ghost" onclick="loadNotes(1)">← 返回列表</button>
+                </div>
+            </div>`;
+        document.getElementById('pager').style.display = 'none';
+
+        // DOM 就绪后渲染 Leaflet 迷你地图
+        if (n.share_token && snapPreview) {
+            setTimeout(() => renderNotePreviewMap(snapPreview), 50);
+        }
+    }
+
+    // --- 内嵌 Leaflet 预览地图（每次 viewNote 调用，确保只存在一个实例） ---
+    let _notePreviewMap = null;
+    function renderNotePreviewMap(preview) {
+        const container = document.getElementById('notePreviewMap');
+        if (!container) return;
+        // 清理旧实例
+        if (_notePreviewMap) { _notePreviewMap.remove(); _notePreviewMap = null; }
+
+        _notePreviewMap = L.map('notePreviewMap', {
+            zoomControl: true, scrollWheelZoom: false,
+            attributionControl: true
+        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(_notePreviewMap);
+
+        const bounds = [];
+        const anns = preview.annotations || [];
+        const routes = preview.routes || [];
+
+        // 渲染批注 marker
+        anns.forEach(a => {
+            const lat = parseFloat(a.lat), lng = parseFloat(a.lng);
+            if (isNaN(lat) || isNaN(lng)) return;
+            bounds.push([lat, lng]);
+            const color = a.color || '#ef4444';
+            const m = L.circleMarker([lat, lng], {
+                radius: 7, color: color, fillColor: color, fillOpacity: 0.9, weight: 2
+            }).addTo(_notePreviewMap);
+            const tip = (a.title || '📍 批注') + (a.content ? '\n' + a.content.substring(0, 80) : '');
+            m.bindTooltip(tip, { maxWidth: 220, direction: 'top', offset: [0, -8] });
+        });
+
+        // 渲染路线 polyline
+        routes.forEach(r => {
+            const rawPts = r.points || [];
+            const pts = rawPts.map(p => {
+                if (Array.isArray(p)) return [parseFloat(p[0]), parseFloat(p[1])];
+                return [parseFloat(p.lat != null ? p.lat : (p.latitude || 0)),
+                        parseFloat(p.lng != null ? p.lng : (p.longitude || 0))];
+            }).filter(pt => !isNaN(pt[0]) && !isNaN(pt[1]));
+            if (pts.length >= 2) {
+                pts.forEach(p => bounds.push(p));
+                const color = r.color || '#22c55e';
+                L.polyline(pts, { color: color, weight: 4, opacity: 0.85 }).addTo(_notePreviewMap);
+            }
+        });
+
+        // 自适应视野
+        if (bounds.length > 0) {
+            _notePreviewMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
+        } else {
+            _notePreviewMap.setView([35, 135], 5);
+        }
+        // innerHTML 重建 DOM 后 Leaflet 可能尺寸不对，强制刷新一次
+        setTimeout(() => _notePreviewMap && _notePreviewMap.invalidateSize(), 150);
+    }
+
+    function viewOnMap() {
+        if (!currentViewingNote || !currentViewingNote.share_token) {
+            toast('这篇游记没有关联地图路线');
+            return;
+        }
+        // 跳转到主地图页，利用已有的 #share=xxx 机制自动预览
+        location.href = '/#share=' + currentViewingNote.share_token;
+    }
+
+    async function openImportModal() {
+        if (!currentViewingNote || !currentViewingNote.share_token) {
+            toast('这篇游记没有可导入的路线');
+            return;
+        }
+        if (!API.isLoggedIn()) {
+            toast('请先登录');
+            setTimeout(() => location.href = '/pages/login.html', 800);
+            return;
+        }
+        // 确保 share 详情已加载
+        if (!currentShareInfo) {
+            try {
+                const sr = await API.inspectShare(currentViewingNote.share_token);
+                if (sr.code === 0) currentShareInfo = sr.data;
+            } catch (e) {}
+        }
+        if (!currentShareInfo) { toast('获取分享信息失败'); return; }
+
+        const info = currentShareInfo;
+        document.getElementById('importMeta').innerHTML =
+            `来源：<b>${escapeHtml(info.owner || '作者')}</b> · ` +
+            `共 <b style="color:#60a5fa;">${info.annotation_count}</b> 个批注，` +
+            `<b style="color:#60a5fa;">${info.route_count}</b> 条路线`;
+
+        // 加载我的行程到下拉框
+        const tr = await API.listTrips();
+        const sel = document.getElementById('imp_trip');
+        if (tr.code !== 0 || !tr.data || tr.data.length === 0) {
+            sel.innerHTML = '<option value="">请先创建一个行程</option>';
+        } else {
+            sel.innerHTML = tr.data.map(t =>
+                `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+        }
+        document.getElementById('importModal').classList.add('show');
+    }
+
+    function closeImportModal() {
+        document.getElementById('importModal').classList.remove('show');
+    }
+
+    async function doImport() {
+        const token = currentViewingNote && currentViewingNote.share_token;
+        if (!token) return;
+        const tripId = document.getElementById('imp_trip').value;
+        if (!tripId) { toast('请选择目标行程'); return; }
+        const mode = document.querySelector('input[name="imp_mode"]:checked').value;
+        const res = await API.importShare(token, { trip_id: parseInt(tripId), mode });
+        if (res.code === 0) {
+            const d = res.data;
+            toast(`✅ 已导入 ${d.added_annotations || 0} 批注 ${d.added_routes || 0} 条路线`);
+            closeImportModal();
+        } else {
+            toast(res.msg || '导入失败');
+        }
+    }
+
+    // 初始加载
+    loadNotes(1);
+</script>
+</body>
+</html>
