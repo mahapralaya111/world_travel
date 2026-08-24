@@ -56,7 +56,7 @@ class Config:
         "host": os.environ.get("MYSQL_HOST", "127.0.0.1"),
         "port": int(os.environ.get("MYSQL_PORT", 3306)),
         "user": os.environ.get("MYSQL_USER", "root"),
-        "password": os.environ.get("MYSQL_PASSWORD", "123456"),
+        "password": os.environ.get("MYSQL_PASSWORD", ""),
         "database": os.environ.get("MYSQL_DB", "travel_planner"),
     }
 
@@ -79,9 +79,9 @@ class Config:
     # JS Key    = "Web端(JS API)"       类型（前端浏览器用）
     # JS Secret = "Web端(JS API)"       配套的 jscode
     # WEB Key   = "Web服务"             类型（后端 REST 用）
-    AMAP_JS_KEY = os.environ.get("AMAP_JS_KEY", "cadc6c1ed07d0d7a9ee1cb7cc2d18e28")
-    AMAP_JS_SECRET = os.environ.get("AMAP_JS_SECRET", "3b327b3a6bbf6b722adf04af97261889")
-    AMAP_WEB_KEY = os.environ.get("AMAP_WEB_KEY", "bdda282a5efb47f3dfc97870cf3a00c4")
+    AMAP_JS_KEY = os.environ.get("AMAP_JS_KEY", "")
+    AMAP_JS_SECRET = os.environ.get("AMAP_JS_SECRET", "")
+    AMAP_WEB_KEY = os.environ.get("AMAP_WEB_KEY", "")
 
     # ---------- 静态数据 ----------
     DATA_DIR = os.path.join(BASE_DIR, "data")

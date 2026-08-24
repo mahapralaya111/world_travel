@@ -1,0 +1,2117 @@
+[
+  {
+    "name": "故宫博物院",
+    "name_en": "The Palace Museum",
+    "country_code": "CN",
+    "lat": 39.9163,
+    "lng": 116.3972,
+    "category": "历史文化",
+    "desc": "明清两代皇家宫殿，世界上最大的宫殿建筑群"
+  },
+  {
+    "name": "长城-八达岭",
+    "name_en": "Badaling Great Wall",
+    "country_code": "CN",
+    "lat": 40.3588,
+    "lng": 116.0203,
+    "category": "历史文化",
+    "desc": "万里长城最著名的段落"
+  },
+  {
+    "name": "兵马俑",
+    "name_en": "Terracotta Warriors",
+    "country_code": "CN",
+    "lat": 34.3845,
+    "lng": 109.2785,
+    "category": "历史文化",
+    "desc": "秦始皇陵陪葬坑，世界第八大奇迹"
+  },
+  {
+    "name": "西湖",
+    "name_en": "West Lake",
+    "country_code": "CN",
+    "lat": 30.2588,
+    "lng": 120.1312,
+    "category": "自然景观",
+    "desc": "杭州标志性湖泊，世界文化遗产"
+  },
+  {
+    "name": "外滩",
+    "name_en": "The Bund",
+    "country_code": "CN",
+    "lat": 31.2397,
+    "lng": 121.4906,
+    "category": "现代地标",
+    "desc": "上海标志性景观，万国建筑博览群"
+  },
+  {
+    "name": "东方明珠",
+    "name_en": "Oriental Pearl Tower",
+    "country_code": "CN",
+    "lat": 31.2397,
+    "lng": 121.4997,
+    "category": "现代地标",
+    "desc": "上海地标电视塔"
+  },
+  {
+    "name": "布达拉宫",
+    "name_en": "Potala Palace",
+    "country_code": "CN",
+    "lat": 29.6554,
+    "lng": 91.176,
+    "category": "历史文化",
+    "desc": "世界屋脊上的宫殿，藏传佛教圣地"
+  },
+  {
+    "name": "张家界",
+    "name_en": "Zhangjiajie",
+    "country_code": "CN",
+    "lat": 29.3249,
+    "lng": 110.4346,
+    "category": "自然景观",
+    "desc": "世界自然遗产，阿凡达取景地"
+  },
+  {
+    "name": "九寨沟",
+    "name_en": "Jiuzhaigou Valley",
+    "country_code": "CN",
+    "lat": 33.26,
+    "lng": 103.92,
+    "category": "自然景观",
+    "desc": "世界自然遗产，人间仙境"
+  },
+  {
+    "name": "桂林山水",
+    "name_en": "Guilin Landscape",
+    "country_code": "CN",
+    "lat": 25.2736,
+    "lng": 110.29,
+    "category": "自然景观",
+    "desc": "天下桂林山水甲天下"
+  },
+  {
+    "name": "黄山",
+    "name_en": "Huangshan",
+    "country_code": "CN",
+    "lat": 30.13,
+    "lng": 118.17,
+    "category": "自然景观",
+    "desc": "五岳归来不看山，黄山归来不看岳"
+  },
+  {
+    "name": "泰山",
+    "name_en": "Mount Tai",
+    "country_code": "CN",
+    "lat": 36.2544,
+    "lng": 117.1,
+    "category": "自然景观",
+    "desc": "五岳之首，世界文化与自然双重遗产"
+  },
+  {
+    "name": "丽江古城",
+    "name_en": "Lijiang Old Town",
+    "country_code": "CN",
+    "lat": 26.8721,
+    "lng": 100.2299,
+    "category": "历史文化",
+    "desc": "世界文化遗产，纳西族古镇"
+  },
+  {
+    "name": "鼓浪屿",
+    "name_en": "Gulangyu",
+    "country_code": "CN",
+    "lat": 24.4483,
+    "lng": 118.065,
+    "category": "历史文化",
+    "desc": "厦门标志性岛屿，万国建筑博物馆"
+  },
+  {
+    "name": "长城-慕田峪",
+    "name_en": "Mutianyu Great Wall",
+    "country_code": "CN",
+    "lat": 40.43,
+    "lng": 116.57,
+    "category": "历史文化",
+    "desc": "长城保存最完好的段落之一"
+  },
+  {
+    "name": "峨眉山",
+    "name_en": "Mount Emei",
+    "country_code": "CN",
+    "lat": 29.5188,
+    "lng": 103.3314,
+    "category": "自然景观",
+    "desc": "中国四大佛教名山之一"
+  },
+  {
+    "name": "乐山大佛",
+    "name_en": "Leshan Giant Buddha",
+    "country_code": "CN",
+    "lat": 29.5472,
+    "lng": 103.7662,
+    "category": "历史文化",
+    "desc": "世界最大的石刻弥勒佛坐像"
+  },
+  {
+    "name": "颐和园",
+    "name_en": "Summer Palace",
+    "country_code": "CN",
+    "lat": 39.9999,
+    "lng": 116.2755,
+    "category": "历史文化",
+    "desc": "中国现存规模最大、保存最完整的皇家园林"
+  },
+  {
+    "name": "东京晴空塔",
+    "name_en": "Tokyo Skytree",
+    "country_code": "JP",
+    "lat": 35.71,
+    "lng": 139.8107,
+    "category": "现代地标",
+    "desc": "世界第二高塔"
+  },
+  {
+    "name": "东京塔",
+    "name_en": "Tokyo Tower",
+    "country_code": "JP",
+    "lat": 35.6586,
+    "lng": 139.7454,
+    "category": "现代地标",
+    "desc": "东京标志性铁塔"
+  },
+  {
+    "name": "浅草寺",
+    "name_en": "Senso-ji Temple",
+    "country_code": "JP",
+    "lat": 35.7149,
+    "lng": 139.7966,
+    "category": "历史文化",
+    "desc": "东京最古老的寺庙"
+  },
+  {
+    "name": "富士山",
+    "name_en": "Mount Fuji",
+    "country_code": "JP",
+    "lat": 35.3606,
+    "lng": 138.7274,
+    "category": "自然景观",
+    "desc": "日本最高峰，世界文化遗产"
+  },
+  {
+    "name": "金阁寺",
+    "name_en": "Kinkaku-ji",
+    "country_code": "JP",
+    "lat": 35.0393,
+    "lng": 135.7292,
+    "category": "历史文化",
+    "desc": "京都著名禅寺，世界文化遗产"
+  },
+  {
+    "name": "清水寺",
+    "name_en": "Kiyomizu-dera",
+    "country_code": "JP",
+    "lat": 34.9948,
+    "lng": 135.7727,
+    "category": "历史文化",
+    "desc": "京都最古老的寺院，世界文化遗产"
+  },
+  {
+    "name": "伏见稻荷大社",
+    "name_en": "Fushimi Inari Taisha",
+    "country_code": "JP",
+    "lat": 34.9671,
+    "lng": 135.7727,
+    "category": "历史文化",
+    "desc": "千本鸟居，日本最美神社之一"
+  },
+  {
+    "name": "东大寺",
+    "name_en": "Todai-ji",
+    "country_code": "JP",
+    "lat": 34.6841,
+    "lng": 135.8428,
+    "category": "历史文化",
+    "desc": "日本最大的木造建筑"
+  },
+  {
+    "name": "奈良公园",
+    "name_en": "Nara Park",
+    "country_code": "JP",
+    "lat": 34.6871,
+    "lng": 135.8409,
+    "category": "自然景观",
+    "desc": "喂鹿胜地，世界文化遗产"
+  },
+  {
+    "name": "严岛神社",
+    "name_en": "Itsukushima Shrine",
+    "country_code": "JP",
+    "lat": 34.2968,
+    "lng": 132.318,
+    "category": "历史文化",
+    "desc": "日本三景之一，海中鸟居"
+  },
+  {
+    "name": "广岛和平纪念公园",
+    "name_en": "Hiroshima Peace Park",
+    "country_code": "JP",
+    "lat": 34.3921,
+    "lng": 132.4537,
+    "category": "历史文化",
+    "desc": "原子弹爆炸遗址，世界文化遗产"
+  },
+  {
+    "name": "北海道小樽运河",
+    "name_en": "Otaru Canal",
+    "country_code": "JP",
+    "lat": 43.19,
+    "lng": 141.01,
+    "category": "历史文化",
+    "desc": "浪漫的运河小镇"
+  },
+  {
+    "name": "冲绳首里城",
+    "name_en": "Shuri Castle",
+    "country_code": "JP",
+    "lat": 26.21,
+    "lng": 127.71,
+    "category": "历史文化",
+    "desc": "琉球王国都城遗址"
+  },
+  {
+    "name": "环球影城日本",
+    "name_en": "Universal Studios Japan",
+    "country_code": "JP",
+    "lat": 34.6655,
+    "lng": 135.4329,
+    "category": "主题乐园",
+    "desc": "亚洲最大的环球影城"
+  },
+  {
+    "name": "景福宫",
+    "name_en": "Gyeongbokgung Palace",
+    "country_code": "KR",
+    "lat": 37.5796,
+    "lng": 126.977,
+    "category": "历史文化",
+    "desc": "朝鲜王朝正宫，首尔五大宫殿之一"
+  },
+  {
+    "name": "首尔塔",
+    "name_en": "N Seoul Tower",
+    "country_code": "KR",
+    "lat": 37.5513,
+    "lng": 126.9866,
+    "category": "现代地标",
+    "desc": "首尔地标电视塔"
+  },
+  {
+    "name": "明洞",
+    "name_en": "Myeongdong",
+    "country_code": "KR",
+    "lat": 37.5664,
+    "lng": 126.9829,
+    "category": "购物商圈",
+    "desc": "首尔最繁华的商业街"
+  },
+  {
+    "name": "济州岛汉拿山",
+    "name_en": "Mount Halla",
+    "country_code": "KR",
+    "lat": 33.3617,
+    "lng": 126.5297,
+    "category": "自然景观",
+    "desc": "韩国最高峰，世界自然遗产"
+  },
+  {
+    "name": "济州岛泰迪熊博物馆",
+    "name_en": "Teddy Bear Museum",
+    "country_code": "KR",
+    "lat": 33.25,
+    "lng": 126.4167,
+    "category": "主题乐园",
+    "desc": "济州岛热门博物馆"
+  },
+  {
+    "name": "釜山塔",
+    "name_en": "Busan Tower",
+    "country_code": "KR",
+    "lat": 35.1045,
+    "lng": 129.0166,
+    "category": "现代地标",
+    "desc": "釜山标志性观光塔"
+  },
+  {
+    "name": "海云台",
+    "name_en": "Haeundae Beach",
+    "country_code": "KR",
+    "lat": 35.1587,
+    "lng": 129.1613,
+    "category": "自然景观",
+    "desc": "韩国最著名的海滩"
+  },
+  {
+    "name": "成吉思汗陵",
+    "name_en": "Genghis Khan Mausoleum",
+    "country_code": "MN",
+    "lat": 39.57,
+    "lng": 109.82,
+    "category": "历史文化",
+    "desc": "成吉思汗衣冠冢"
+  },
+  {
+    "name": "大皇宫",
+    "name_en": "Grand Palace",
+    "country_code": "TH",
+    "lat": 13.7517,
+    "lng": 100.4933,
+    "category": "历史文化",
+    "desc": "曼谷地标，泰国王室宫殿"
+  },
+  {
+    "name": "卧佛寺",
+    "name_en": "Wat Pho",
+    "country_code": "TH",
+    "lat": 13.7465,
+    "lng": 100.4927,
+    "category": "历史文化",
+    "desc": "世界最大卧佛所在寺庙"
+  },
+  {
+    "name": "郑王庙",
+    "name_en": "Wat Arun",
+    "country_code": "TH",
+    "lat": 13.7437,
+    "lng": 100.4889,
+    "category": "历史文化",
+    "desc": "曼谷标志性佛庙，日落美景"
+  },
+  {
+    "name": "普吉岛",
+    "name_en": "Phuket",
+    "country_code": "TH",
+    "lat": 7.8703,
+    "lng": 98.3923,
+    "category": "自然景观",
+    "desc": "泰国最大的岛屿，度假胜地"
+  },
+  {
+    "name": "芭提雅",
+    "name_en": "Pattaya",
+    "country_code": "TH",
+    "lat": 12.9076,
+    "lng": 100.8787,
+    "category": "海滨度假",
+    "desc": "泰国著名海滨度假城市"
+  },
+  {
+    "name": "清迈古城",
+    "name_en": "Chiang Mai Old City",
+    "country_code": "TH",
+    "lat": 18.79,
+    "lng": 98.99,
+    "category": "历史文化",
+    "desc": "泰北玫瑰，千年古城"
+  },
+  {
+    "name": "吴哥窟",
+    "name_en": "Angkor Wat",
+    "country_code": "TH",
+    "lat": 13.4125,
+    "lng": 103.867,
+    "category": "历史文化",
+    "desc": "世界最大的宗教建筑（位于柬埔寨边境）"
+  },
+  {
+    "name": "滨海湾金沙",
+    "name_en": "Marina Bay Sands",
+    "country_code": "SG",
+    "lat": 1.2834,
+    "lng": 103.8607,
+    "category": "现代地标",
+    "desc": "新加坡标志性建筑，空中花园泳池"
+  },
+  {
+    "name": "新加坡空中花园",
+    "name_en": "Garden by the Bay",
+    "country_code": "SG",
+    "lat": 1.2816,
+    "lng": 103.8636,
+    "category": "现代地标",
+    "desc": "超级树灯光秀"
+  },
+  {
+    "name": "圣淘沙",
+    "name_en": "Sentosa",
+    "country_code": "SG",
+    "lat": 1.25,
+    "lng": 103.825,
+    "category": "主题乐园",
+    "desc": "新加坡度假岛屿"
+  },
+  {
+    "name": "环球影城新加坡",
+    "name_en": "Universal Studios Singapore",
+    "country_code": "SG",
+    "lat": 1.254,
+    "lng": 103.8238,
+    "category": "主题乐园",
+    "desc": "东南亚首个环球影城"
+  },
+  {
+    "name": "双子塔",
+    "name_en": "Petronas Twin Towers",
+    "country_code": "MY",
+    "lat": 3.1579,
+    "lng": 101.7116,
+    "category": "现代地标",
+    "desc": "吉隆坡地标建筑"
+  },
+  {
+    "name": "吉隆坡塔",
+    "name_en": "Kuala Lumpur Tower",
+    "country_code": "MY",
+    "lat": 3.1527,
+    "lng": 101.7038,
+    "category": "现代地标",
+    "desc": "吉隆坡电视塔"
+  },
+  {
+    "name": "独立广场",
+    "name_en": "Merdeka Square",
+    "country_code": "MY",
+    "lat": 3.1473,
+    "lng": 101.697,
+    "category": "历史文化",
+    "desc": "马来西亚独立纪念地"
+  },
+  {
+    "name": "兰卡威",
+    "name_en": "Langkawi",
+    "country_code": "MY",
+    "lat": 6.3494,
+    "lng": 99.84,
+    "category": "自然景观",
+    "desc": "马来西亚度假海岛"
+  },
+  {
+    "name": "巴厘岛",
+    "name_en": "Bali",
+    "country_code": "ID",
+    "lat": -8.3405,
+    "lng": 115.092,
+    "category": "自然景观",
+    "desc": "世界著名度假岛屿"
+  },
+  {
+    "name": "乌布猴林",
+    "name_en": "Ubud Monkey Forest",
+    "country_code": "ID",
+    "lat": -8.5167,
+    "lng": 115.25,
+    "category": "自然景观",
+    "desc": "巴厘岛热门景点"
+  },
+  {
+    "name": "婆罗浮屠",
+    "name_en": "Borobudur",
+    "country_code": "ID",
+    "lat": -7.6079,
+    "lng": 110.2038,
+    "category": "历史文化",
+    "desc": "世界最大的佛教遗迹"
+  },
+  {
+    "name": "下龙湾",
+    "name_en": "Ha Long Bay",
+    "country_code": "VN",
+    "lat": 20.91,
+    "lng": 107.18,
+    "category": "自然景观",
+    "desc": "世界自然遗产，海上桂林"
+  },
+  {
+    "name": "河内还剑湖",
+    "name_en": "Hoan Kiem Lake",
+    "country_code": "VN",
+    "lat": 21.0285,
+    "lng": 105.8542,
+    "category": "历史文化",
+    "desc": "河内标志性湖泊"
+  },
+  {
+    "name": "胡志明市市政厅",
+    "name_en": "Ho Chi Minh City Hall",
+    "country_code": "VN",
+    "lat": 10.7717,
+    "lng": 106.7022,
+    "category": "历史文化",
+    "desc": "越南最大城市标志性建筑"
+  },
+  {
+    "name": "美奈",
+    "name_en": "Mui Ne",
+    "country_code": "VN",
+    "lat": 10.93,
+    "lng": 108.26,
+    "category": "海滨度假",
+    "desc": "越南海滨度假胜地"
+  },
+  {
+    "name": "长滩岛",
+    "name_en": "Boracay",
+    "country_code": "PH",
+    "lat": 11.967,
+    "lng": 121.917,
+    "category": "自然景观",
+    "desc": "世界最美白沙滩"
+  },
+  {
+    "name": "马尼拉大教堂",
+    "name_en": "Manila Cathedral",
+    "country_code": "PH",
+    "lat": 14.59,
+    "lng": 120.9736,
+    "category": "历史文化",
+    "desc": "菲律宾最古老的石造教堂"
+  },
+  {
+    "name": "泰姬陵",
+    "name_en": "Taj Mahal",
+    "country_code": "IN",
+    "lat": 27.1751,
+    "lng": 78.0421,
+    "category": "历史文化",
+    "desc": "世界新七大奇迹，白色大理石陵墓"
+  },
+  {
+    "name": "德里红堡",
+    "name_en": "Red Fort",
+    "country_code": "IN",
+    "lat": 28.6562,
+    "lng": 77.241,
+    "category": "历史文化",
+    "desc": "莫卧儿帝国皇宫"
+  },
+  {
+    "name": "印度门",
+    "name_en": "India Gate",
+    "country_code": "IN",
+    "lat": 28.6129,
+    "lng": 77.2295,
+    "category": "历史文化",
+    "desc": "新德里标志性建筑"
+  },
+  {
+    "name": "埃洛拉石窟",
+    "name_en": "Ellora Caves",
+    "country_code": "IN",
+    "lat": 20.0345,
+    "lng": 75.1762,
+    "category": "历史文化",
+    "desc": "世界最大的石窟群之一"
+  },
+  {
+    "name": "果阿海滩",
+    "name_en": "Goa Beaches",
+    "country_code": "IN",
+    "lat": 15.4909,
+    "lng": 73.8278,
+    "category": "海滨度假",
+    "desc": "印度最著名的海滩度假地"
+  },
+  {
+    "name": "珠穆朗玛峰",
+    "name_en": "Mount Everest",
+    "country_code": "NP",
+    "lat": 27.9881,
+    "lng": 86.925,
+    "category": "自然景观",
+    "desc": "世界最高峰，海拔 8848.86 米"
+  },
+  {
+    "name": "加德满都杜巴广场",
+    "name_en": "Kathmandu Durbar Square",
+    "country_code": "NP",
+    "lat": 27.704,
+    "lng": 85.3082,
+    "category": "历史文化",
+    "desc": "尼泊尔皇家宫殿广场"
+  },
+  {
+    "name": "锡吉里耶狮子岩",
+    "name_en": "Sigiriya",
+    "country_code": "LK",
+    "lat": 7.9572,
+    "lng": 80.7556,
+    "category": "历史文化",
+    "desc": "世界文化遗产，空中堡垒"
+  },
+  {
+    "name": "加勒古堡",
+    "name_en": "Galle Fort",
+    "country_code": "LK",
+    "lat": 6.027,
+    "lng": 80.2175,
+    "category": "历史文化",
+    "desc": "世界文化遗产，荷兰殖民风格古堡"
+  },
+  {
+    "name": "哈利法塔",
+    "name_en": "Burj Khalifa",
+    "country_code": "AE",
+    "lat": 25.1972,
+    "lng": 55.2744,
+    "category": "现代地标",
+    "desc": "世界最高建筑，828 米"
+  },
+  {
+    "name": "迪拜喷泉",
+    "name_en": "Dubai Fountain",
+    "country_code": "AE",
+    "lat": 25.197,
+    "lng": 55.274,
+    "category": "现代地标",
+    "desc": "世界最大的音乐喷泉"
+  },
+  {
+    "name": "亚特兰蒂斯酒店",
+    "name_en": "Atlantis Palm",
+    "country_code": "AE",
+    "lat": 25.1172,
+    "lng": 55.1172,
+    "category": "主题乐园",
+    "desc": "迪拜棕榈岛度假酒店"
+  },
+  {
+    "name": "帆船酒店",
+    "name_en": "Burj Al Arab",
+    "country_code": "AE",
+    "lat": 25.1414,
+    "lng": 55.1852,
+    "category": "现代地标",
+    "desc": "迪拜标志性七星级酒店"
+  },
+  {
+    "name": "麦加天房",
+    "name_en": "Kaaba",
+    "country_code": "SA",
+    "lat": 21.4225,
+    "lng": 39.8262,
+    "category": "历史文化",
+    "desc": "伊斯兰教最神圣的圣地"
+  },
+  {
+    "name": "麦地那先知清真寺",
+    "name_en": "Prophets Mosque",
+    "country_code": "SA",
+    "lat": 24.4686,
+    "lng": 39.6138,
+    "category": "历史文化",
+    "desc": "伊斯兰教第二大圣地"
+  },
+  {
+    "name": "圣索菲亚大教堂",
+    "name_en": "Hagia Sophia",
+    "country_code": "TR",
+    "lat": 41.0086,
+    "lng": 28.9802,
+    "category": "历史文化",
+    "desc": "君士坦丁堡标志性建筑，世界文化遗产"
+  },
+  {
+    "name": "蓝色清真寺",
+    "name_en": "Blue Mosque",
+    "country_code": "TR",
+    "lat": 41.0054,
+    "lng": 28.9769,
+    "category": "历史文化",
+    "desc": "伊斯坦布尔著名清真寺"
+  },
+  {
+    "name": "卡帕多奇亚",
+    "name_en": "Cappadocia",
+    "country_code": "TR",
+    "lat": 38.6414,
+    "lng": 34.8278,
+    "category": "自然景观",
+    "desc": "热气球胜地，世界自然遗产"
+  },
+  {
+    "name": "棉花堡",
+    "name_en": "Pamukkale",
+    "country_code": "TR",
+    "lat": 37.9212,
+    "lng": 29.1219,
+    "category": "自然景观",
+    "desc": "白色钙化梯田温泉，世界自然遗产"
+  },
+  {
+    "name": "特洛伊古城",
+    "name_en": "Troy",
+    "country_code": "TR",
+    "lat": 39.9555,
+    "lng": 26.2337,
+    "category": "历史文化",
+    "desc": "世界文化遗产，特洛伊战争遗址"
+  },
+  {
+    "name": "耶路撒冷老城",
+    "name_en": "Jerusalem Old City",
+    "country_code": "IL",
+    "lat": 31.7767,
+    "lng": 35.2345,
+    "category": "历史文化",
+    "desc": "世界文化遗产，三大宗教圣地"
+  },
+  {
+    "name": "死海",
+    "name_en": "Dead Sea",
+    "country_code": "IL",
+    "lat": 31.5,
+    "lng": 35.5,
+    "category": "自然景观",
+    "desc": "地球陆地最低点，-430 米"
+  },
+  {
+    "name": "波斯波利斯",
+    "name_en": "Persepolis",
+    "country_code": "IR",
+    "lat": 29.9351,
+    "lng": 52.8915,
+    "category": "历史文化",
+    "desc": "世界文化遗产，波斯帝国都城遗址"
+  },
+  {
+    "name": "伊斯法罕伊玛目广场",
+    "name_en": "Imam Square",
+    "country_code": "IR",
+    "lat": 32.6546,
+    "lng": 51.6797,
+    "category": "历史文化",
+    "desc": "世界文化遗产，伊朗最大的广场"
+  },
+  {
+    "name": "大本钟",
+    "name_en": "Big Ben",
+    "country_code": "GB",
+    "lat": 51.5007,
+    "lng": -0.1246,
+    "category": "历史文化",
+    "desc": "伦敦标志性钟楼（现名伊丽莎白塔）"
+  },
+  {
+    "name": "威斯敏斯特教堂",
+    "name_en": "Westminster Abbey",
+    "country_code": "GB",
+    "lat": 51.4994,
+    "lng": -0.1273,
+    "category": "历史文化",
+    "desc": "英国国王加冕教堂，世界文化遗产"
+  },
+  {
+    "name": "白金汉宫",
+    "name_en": "Buckingham Palace",
+    "country_code": "GB",
+    "lat": 51.5014,
+    "lng": -0.1419,
+    "category": "历史文化",
+    "desc": "英国女王官邸"
+  },
+  {
+    "name": "伦敦塔",
+    "name_en": "Tower of London",
+    "country_code": "GB",
+    "lat": 51.5081,
+    "lng": -0.0759,
+    "category": "历史文化",
+    "desc": "世界文化遗产，英国王室城堡"
+  },
+  {
+    "name": "塔桥",
+    "name_en": "Tower Bridge",
+    "country_code": "GB",
+    "lat": 51.5055,
+    "lng": -0.0754,
+    "category": "历史文化",
+    "desc": "伦敦标志性桥梁"
+  },
+  {
+    "name": "伦敦眼",
+    "name_en": "London Eye",
+    "country_code": "GB",
+    "lat": 51.5033,
+    "lng": -0.1194,
+    "category": "现代地标",
+    "desc": "世界上最大的摩天轮之一"
+  },
+  {
+    "name": "大英博物馆",
+    "name_en": "British Museum",
+    "country_code": "GB",
+    "lat": 51.5194,
+    "lng": -0.127,
+    "category": "历史文化",
+    "desc": "世界上规模最大的博物馆之一"
+  },
+  {
+    "name": "巨石阵",
+    "name_en": "Stonehenge",
+    "country_code": "GB",
+    "lat": 51.1788,
+    "lng": -1.8262,
+    "category": "历史文化",
+    "desc": "世界文化遗产，史前巨石圈"
+  },
+  {
+    "name": "爱丁堡城堡",
+    "name_en": "Edinburgh Castle",
+    "country_code": "GB",
+    "lat": 55.9486,
+    "lng": -3.1999,
+    "category": "历史文化",
+    "desc": "苏格兰标志性城堡"
+  },
+  {
+    "name": "剑桥大学",
+    "name_en": "University of Cambridge",
+    "country_code": "GB",
+    "lat": 52.2053,
+    "lng": 0.1218,
+    "category": "历史文化",
+    "desc": "世界顶级学府"
+  },
+  {
+    "name": "牛津大学",
+    "name_en": "University of Oxford",
+    "country_code": "GB",
+    "lat": 51.7548,
+    "lng": -1.2547,
+    "category": "历史文化",
+    "desc": "世界最古老的英语大学"
+  },
+  {
+    "name": "埃菲尔铁塔",
+    "name_en": "Eiffel Tower",
+    "country_code": "FR",
+    "lat": 48.8584,
+    "lng": 2.2945,
+    "category": "现代地标",
+    "desc": "巴黎标志性建筑，世界著名地标"
+  },
+  {
+    "name": "卢浮宫",
+    "name_en": "Louvre Museum",
+    "country_code": "FR",
+    "lat": 48.8606,
+    "lng": 2.3376,
+    "category": "历史文化",
+    "desc": "世界最大的艺术博物馆"
+  },
+  {
+    "name": "巴黎圣母院",
+    "name_en": "Notre-Dame Cathedral",
+    "country_code": "FR",
+    "lat": 48.8529,
+    "lng": 2.3499,
+    "category": "历史文化",
+    "desc": "哥特式建筑典范，世界文化遗产"
+  },
+  {
+    "name": "凯旋门",
+    "name_en": "Arc de Triomphe",
+    "country_code": "FR",
+    "lat": 48.8738,
+    "lng": 2.295,
+    "category": "历史文化",
+    "desc": "巴黎星形广场凯旋门"
+  },
+  {
+    "name": "香榭丽舍大街",
+    "name_en": "Champs-Élysées",
+    "country_code": "FR",
+    "lat": 48.8699,
+    "lng": 2.3079,
+    "category": "购物商圈",
+    "desc": "世界最著名的时尚大道"
+  },
+  {
+    "name": "蒙马特",
+    "name_en": "Montmartre",
+    "country_code": "FR",
+    "lat": 48.8877,
+    "lng": 2.3207,
+    "category": "历史文化",
+    "desc": "巴黎艺术家聚居区"
+  },
+  {
+    "name": "凡尔赛宫",
+    "name_en": "Palace of Versailles",
+    "country_code": "FR",
+    "lat": 48.8049,
+    "lng": 2.1204,
+    "category": "历史文化",
+    "desc": "世界最大的宫殿之一，世界文化遗产"
+  },
+  {
+    "name": "枫丹白露宫",
+    "name_en": "Palace of Fontainebleau",
+    "country_code": "FR",
+    "lat": 48.407,
+    "lng": 2.7036,
+    "category": "历史文化",
+    "desc": "法国国王狩猎行宫"
+  },
+  {
+    "name": "圣米歇尔山",
+    "name_en": "Mont-Saint-Michel",
+    "country_code": "FR",
+    "lat": 48.6358,
+    "lng": -1.5115,
+    "category": "历史文化",
+    "desc": "世界文化遗产，潮汐城堡"
+  },
+  {
+    "name": "戛纳电影节",
+    "name_en": "Cannes",
+    "country_code": "FR",
+    "lat": 43.5524,
+    "lng": 7.0827,
+    "category": "海滨度假",
+    "desc": "戛纳海滨度假胜地"
+  },
+  {
+    "name": "普罗旺斯薰衣草",
+    "name_en": "Provence",
+    "country_code": "FR",
+    "lat": 43.83,
+    "lng": 5.43,
+    "category": "自然景观",
+    "desc": "薰衣草之乡"
+  },
+  {
+    "name": "斗兽场",
+    "name_en": "Colosseum",
+    "country_code": "IT",
+    "lat": 41.8902,
+    "lng": 12.4922,
+    "category": "历史文化",
+    "desc": "罗马帝国圆形竞技场，世界新七大奇迹"
+  },
+  {
+    "name": "梵蒂冈圣彼得大教堂",
+    "name_en": "St. Peters Basilica",
+    "country_code": "IT",
+    "lat": 41.9022,
+    "lng": 12.4539,
+    "category": "历史文化",
+    "desc": "世界最大的天主教教堂"
+  },
+  {
+    "name": "特雷维喷泉",
+    "name_en": "Trevi Fountain",
+    "country_code": "IT",
+    "lat": 41.9009,
+    "lng": 12.4833,
+    "category": "历史文化",
+    "desc": "罗马最著名的喷泉"
+  },
+  {
+    "name": "西班牙阶梯",
+    "name_en": "Spanish Steps",
+    "country_code": "IT",
+    "lat": 41.906,
+    "lng": 12.4833,
+    "category": "历史文化",
+    "desc": "罗马标志性阶梯广场"
+  },
+  {
+    "name": "比萨斜塔",
+    "name_en": "Leaning Tower of Pisa",
+    "country_code": "IT",
+    "lat": 43.723,
+    "lng": 10.3966,
+    "category": "历史文化",
+    "desc": "世界著名的倾斜钟楼"
+  },
+  {
+    "name": "威尼斯大运河",
+    "name_en": "Grand Canal",
+    "country_code": "IT",
+    "lat": 45.4408,
+    "lng": 12.3155,
+    "category": "历史文化",
+    "desc": "威尼斯主要水道"
+  },
+  {
+    "name": "圣马可广场",
+    "name_en": "St. Marks Square",
+    "country_code": "IT",
+    "lat": 45.4344,
+    "lng": 12.3393,
+    "category": "历史文化",
+    "desc": "威尼斯中心广场"
+  },
+  {
+    "name": "佛罗伦萨圣母百花大教堂",
+    "name_en": "Florence Cathedral",
+    "country_code": "IT",
+    "lat": 43.7731,
+    "lng": 11.256,
+    "category": "历史文化",
+    "desc": "文艺复兴建筑典范"
+  },
+  {
+    "name": "乌菲兹美术馆",
+    "name_en": "Uffizi Gallery",
+    "country_code": "IT",
+    "lat": 43.7677,
+    "lng": 11.2553,
+    "category": "历史文化",
+    "desc": "世界最著名的美术馆之一"
+  },
+  {
+    "name": "那不勒斯庞贝古城",
+    "name_en": "Pompeii",
+    "country_code": "IT",
+    "lat": 40.7508,
+    "lng": 14.4898,
+    "category": "历史文化",
+    "desc": "世界文化遗产，火山熔岩下的古城"
+  },
+  {
+    "name": "米兰大教堂",
+    "name_en": "Milan Cathedral",
+    "country_code": "IT",
+    "lat": 45.4641,
+    "lng": 9.1919,
+    "category": "历史文化",
+    "desc": "世界最大的哥特式教堂"
+  },
+  {
+    "name": "米兰圣玛利亚感恩教堂",
+    "name_en": "Santa Maria delle Grazie",
+    "country_code": "IT",
+    "lat": 45.4664,
+    "lng": 9.173,
+    "category": "历史文化",
+    "desc": "达芬奇《最后的晚餐》所在地"
+  },
+  {
+    "name": "西西里岛",
+    "name_en": "Sicily",
+    "country_code": "IT",
+    "lat": 37.5,
+    "lng": 14.2,
+    "category": "自然景观",
+    "desc": "地中海最大岛屿"
+  },
+  {
+    "name": "巴塞罗那圣家堂",
+    "name_en": "Sagrada Família",
+    "country_code": "ES",
+    "lat": 41.4036,
+    "lng": 2.1744,
+    "category": "历史文化",
+    "desc": "高迪设计的未完工大教堂，世界文化遗产"
+  },
+  {
+    "name": "巴塞罗那古埃尔公园",
+    "name_en": "Park Güell",
+    "country_code": "ES",
+    "lat": 41.4146,
+    "lng": 2.1525,
+    "category": "历史文化",
+    "desc": "高迪设计的梦幻公园，世界文化遗产"
+  },
+  {
+    "name": "马德里皇宫",
+    "name_en": "Royal Palace of Madrid",
+    "country_code": "ES",
+    "lat": 40.4154,
+    "lng": -3.7147,
+    "category": "历史文化",
+    "desc": "西班牙国王官邸"
+  },
+  {
+    "name": "马德里伯纳乌球场",
+    "name_en": "Santiago Bernabéu",
+    "country_code": "ES",
+    "lat": 40.4506,
+    "lng": -3.6883,
+    "category": "现代地标",
+    "desc": "皇家马德里主场"
+  },
+  {
+    "name": "塞维利亚西班牙广场",
+    "name_en": "Plaza de España",
+    "country_code": "ES",
+    "lat": 37.3753,
+    "lng": -5.9864,
+    "category": "历史文化",
+    "desc": "塞维利亚标志性广场"
+  },
+  {
+    "name": "格拉纳达阿尔罕布拉宫",
+    "name_en": "Alhambra",
+    "country_code": "ES",
+    "lat": 37.1761,
+    "lng": -3.5881,
+    "category": "历史文化",
+    "desc": "世界文化遗产，摩尔人宫殿"
+  },
+  {
+    "name": "勃兰登堡门",
+    "name_en": "Brandenburg Gate",
+    "country_code": "DE",
+    "lat": 52.5163,
+    "lng": 13.3777,
+    "category": "历史文化",
+    "desc": "柏林标志性建筑，德国统一象征"
+  },
+  {
+    "name": "柏林墙遗址",
+    "name_en": "Berlin Wall Memorial",
+    "country_code": "DE",
+    "lat": 52.4872,
+    "lng": 13.384,
+    "category": "历史文化",
+    "desc": "冷战历史纪念地"
+  },
+  {
+    "name": "慕尼黑市政厅",
+    "name_en": "Munich Rathaus",
+    "country_code": "DE",
+    "lat": 48.1374,
+    "lng": 11.5755,
+    "category": "历史文化",
+    "desc": "慕尼黑标志性新哥特式建筑"
+  },
+  {
+    "name": "新天鹅堡",
+    "name_en": "Neuschwanstein Castle",
+    "country_code": "DE",
+    "lat": 47.5576,
+    "lng": 10.7498,
+    "category": "历史文化",
+    "desc": "迪士尼城堡原型，巴伐利亚童话城堡"
+  },
+  {
+    "name": "科隆大教堂",
+    "name_en": "Cologne Cathedral",
+    "country_code": "DE",
+    "lat": 50.9412,
+    "lng": 6.9557,
+    "category": "历史文化",
+    "desc": "世界文化遗产，德国最大的哥特式教堂"
+  },
+  {
+    "name": "海德堡城堡",
+    "name_en": "Heidelberg Castle",
+    "country_code": "DE",
+    "lat": 49.4142,
+    "lng": 8.7115,
+    "category": "历史文化",
+    "desc": "德国最著名的城堡遗址"
+  },
+  {
+    "name": "少女峰",
+    "name_en": "Jungfrau",
+    "country_code": "CH",
+    "lat": 46.5362,
+    "lng": 7.9657,
+    "category": "自然景观",
+    "desc": "欧洲之巅，世界自然遗产"
+  },
+  {
+    "name": "马特洪峰",
+    "name_en": "Matterhorn",
+    "country_code": "CH",
+    "lat": 45.9765,
+    "lng": 7.6586,
+    "category": "自然景观",
+    "desc": "阿尔卑斯山标志性山峰"
+  },
+  {
+    "name": "日内瓦湖",
+    "name_en": "Lake Geneva",
+    "country_code": "CH",
+    "lat": 46.446,
+    "lng": 6.251,
+    "category": "自然景观",
+    "desc": "阿尔卑斯山最大湖泊"
+  },
+  {
+    "name": "阿姆斯特丹运河",
+    "name_en": "Amsterdam Canals",
+    "country_code": "NL",
+    "lat": 52.3676,
+    "lng": 4.9041,
+    "category": "历史文化",
+    "desc": "世界文化遗产，北方威尼斯"
+  },
+  {
+    "name": "梵高博物馆",
+    "name_en": "Van Gogh Museum",
+    "country_code": "NL",
+    "lat": 52.3584,
+    "lng": 4.8811,
+    "category": "历史文化",
+    "desc": "世界最大的梵高作品收藏地"
+  },
+  {
+    "name": "库肯霍夫郁金香公园",
+    "name_en": "Keukenhof",
+    "country_code": "NL",
+    "lat": 52.26,
+    "lng": 4.54,
+    "category": "自然景观",
+    "desc": "世界最大的郁金香花园"
+  },
+  {
+    "name": "布鲁塞尔大广场",
+    "name_en": "Grand Place",
+    "country_code": "BE",
+    "lat": 50.8467,
+    "lng": 4.3525,
+    "category": "历史文化",
+    "desc": "世界文化遗产，布鲁塞尔中心广场"
+  },
+  {
+    "name": "撒尿小童",
+    "name_en": "Manneken Pis",
+    "country_code": "BE",
+    "lat": 50.8456,
+    "lng": 4.3515,
+    "category": "历史文化",
+    "desc": "布鲁塞尔标志性小雕像"
+  },
+  {
+    "name": "美泉宫",
+    "name_en": "Schönbrunn Palace",
+    "country_code": "AT",
+    "lat": 48.1843,
+    "lng": 16.312,
+    "category": "历史文化",
+    "desc": "世界文化遗产，哈布斯堡王朝夏宫"
+  },
+  {
+    "name": "维也纳国家歌剧院",
+    "name_en": "Vienna State Opera",
+    "country_code": "AT",
+    "lat": 48.2035,
+    "lng": 16.3703,
+    "category": "历史文化",
+    "desc": "世界著名歌剧院"
+  },
+  {
+    "name": "萨尔茨堡",
+    "name_en": "Salzburg",
+    "country_code": "AT",
+    "lat": 47.7964,
+    "lng": 13.0481,
+    "category": "历史文化",
+    "desc": "莫扎特出生地，世界文化遗产"
+  },
+  {
+    "name": "哈尔施塔特",
+    "name_en": "Hallstatt",
+    "country_code": "AT",
+    "lat": 47.5639,
+    "lng": 13.6451,
+    "category": "自然景观",
+    "desc": "世界文化遗产，最美小镇"
+  },
+  {
+    "name": "挪威峡湾",
+    "name_en": "Norwegian Fjords",
+    "country_code": "NO",
+    "lat": 60.75,
+    "lng": 7.1,
+    "category": "自然景观",
+    "desc": "世界自然遗产，松恩峡湾"
+  },
+  {
+    "name": "布道石",
+    "name_en": "Preikestolen",
+    "country_code": "NO",
+    "lat": 58.9841,
+    "lng": 6.1977,
+    "category": "自然景观",
+    "desc": "挪威著名徒步景点，悬崖观景点"
+  },
+  {
+    "name": "奥斯陆市政厅",
+    "name_en": "Oslo City Hall",
+    "country_code": "NO",
+    "lat": 59.9138,
+    "lng": 10.733,
+    "category": "历史文化",
+    "desc": "诺贝尔和平奖颁奖典礼举办地"
+  },
+  {
+    "name": "维京航海博物馆",
+    "name_en": "Viking Ship Museum",
+    "country_code": "NO",
+    "lat": 59.9043,
+    "lng": 10.6704,
+    "category": "历史文化",
+    "desc": "奥斯陆著名博物馆"
+  },
+  {
+    "name": "斯德哥尔摩老城",
+    "name_en": "Gamla Stan",
+    "country_code": "SE",
+    "lat": 59.3247,
+    "lng": 18.0704,
+    "category": "历史文化",
+    "desc": "世界文化遗产，北欧最美古城"
+  },
+  {
+    "name": "瑞典王宫",
+    "name_en": "Stockholm Palace",
+    "country_code": "SE",
+    "lat": 59.3273,
+    "lng": 18.0714,
+    "category": "历史文化",
+    "desc": "瑞典国王官邸"
+  },
+  {
+    "name": "沃尔沃博物馆",
+    "name_en": "Volvo Museum",
+    "country_code": "SE",
+    "lat": 57.7087,
+    "lng": 11.9556,
+    "category": "历史文化",
+    "desc": "哥德堡著名博物馆"
+  },
+  {
+    "name": "芬兰堡",
+    "name_en": "Suomenlinna",
+    "country_code": "FI",
+    "lat": 60.144,
+    "lng": 24.984,
+    "category": "历史文化",
+    "desc": "世界文化遗产，海上城堡"
+  },
+  {
+    "name": "赫尔辛基大教堂",
+    "name_en": "Helsinki Cathedral",
+    "country_code": "FI",
+    "lat": 60.1756,
+    "lng": 24.9597,
+    "category": "历史文化",
+    "desc": "芬兰最著名的路德宗大教堂"
+  },
+  {
+    "name": "罗瓦涅米圣诞老人村",
+    "name_en": "Santa Claus Village",
+    "country_code": "FI",
+    "lat": 66.5437,
+    "lng": 25.8467,
+    "category": "主题乐园",
+    "desc": "拉普兰地区，圣诞老人故乡"
+  },
+  {
+    "name": "黄金圈",
+    "name_en": "Golden Circle",
+    "country_code": "IS",
+    "lat": 64.325,
+    "lng": -20.119,
+    "category": "自然景观",
+    "desc": "冰岛三大著名景点路线"
+  },
+  {
+    "name": "蓝湖温泉",
+    "name_en": "Blue Lagoon",
+    "country_code": "IS",
+    "lat": 63.888,
+    "lng": -22.446,
+    "category": "自然景观",
+    "desc": "冰岛最著名的地热温泉"
+  },
+  {
+    "name": "冰川泻湖",
+    "name_en": "Jökulsárlón",
+    "country_code": "IS",
+    "lat": 64.048,
+    "lng": -16.2,
+    "category": "自然景观",
+    "desc": "冰岛最大的冰川泻湖，冰沙滩"
+  },
+  {
+    "name": "美人鱼雕像",
+    "name_en": "The Little Mermaid",
+    "country_code": "DK",
+    "lat": 55.6927,
+    "lng": 12.5911,
+    "category": "历史文化",
+    "desc": "哥本哈根标志性雕像"
+  },
+  {
+    "name": "蒂沃利公园",
+    "name_en": "Tivoli Gardens",
+    "country_code": "DK",
+    "lat": 55.6737,
+    "lng": 12.5695,
+    "category": "主题乐园",
+    "desc": "世界最古老的游乐园之一"
+  },
+  {
+    "name": "罗斯基勒大教堂",
+    "name_en": "Roskilde Cathedral",
+    "country_code": "DK",
+    "lat": 55.6475,
+    "lng": 12.0777,
+    "category": "历史文化",
+    "desc": "世界文化遗产，丹麦王室陵墓"
+  },
+  {
+    "name": "雅典卫城",
+    "name_en": "Acropolis",
+    "country_code": "GR",
+    "lat": 37.9715,
+    "lng": 23.7257,
+    "category": "历史文化",
+    "desc": "世界文化遗产，帕特农神庙所在地"
+  },
+  {
+    "name": "德尔菲阿波罗神庙",
+    "name_en": "Delphi",
+    "country_code": "GR",
+    "lat": 38.4826,
+    "lng": 22.5008,
+    "category": "历史文化",
+    "desc": "世界文化遗产，古希腊宗教中心"
+  },
+  {
+    "name": "圣托里尼岛",
+    "name_en": "Santorini",
+    "country_code": "GR",
+    "lat": 36.3932,
+    "lng": 25.4615,
+    "category": "自然景观",
+    "desc": "世界最美日落，蓝白小镇"
+  },
+  {
+    "name": "米科诺斯岛",
+    "name_en": "Mykonos",
+    "country_code": "GR",
+    "lat": 37.4467,
+    "lng": 25.3289,
+    "category": "海滨度假",
+    "desc": "希腊著名度假岛屿"
+  },
+  {
+    "name": "红场",
+    "name_en": "Red Square",
+    "country_code": "RU",
+    "lat": 55.7539,
+    "lng": 37.6208,
+    "category": "历史文化",
+    "desc": "莫斯科标志性广场"
+  },
+  {
+    "name": "克里姆林宫",
+    "name_en": "Kremlin",
+    "country_code": "RU",
+    "lat": 55.752,
+    "lng": 37.6175,
+    "category": "历史文化",
+    "desc": "俄罗斯总统府所在地"
+  },
+  {
+    "name": "冬宫",
+    "name_en": "Winter Palace",
+    "country_code": "RU",
+    "lat": 59.9397,
+    "lng": 30.3304,
+    "category": "历史文化",
+    "desc": "圣彼得堡标志性建筑，埃尔米塔日博物馆"
+  },
+  {
+    "name": "彼得夏宫",
+    "name_en": "Peterhof",
+    "country_code": "RU",
+    "lat": 59.8812,
+    "lng": 29.9079,
+    "category": "历史文化",
+    "desc": "世界文化遗产，俄罗斯皇家园林"
+  },
+  {
+    "name": "贝加尔湖",
+    "name_en": "Lake Baikal",
+    "country_code": "RU",
+    "lat": 51.9169,
+    "lng": 105.0506,
+    "category": "自然景观",
+    "desc": "世界最深的淡水湖，世界自然遗产"
+  },
+  {
+    "name": "自由女神像",
+    "name_en": "Statue of Liberty",
+    "country_code": "US",
+    "lat": 40.6892,
+    "lng": -74.0445,
+    "category": "历史文化",
+    "desc": "美国标志，法国赠礼"
+  },
+  {
+    "name": "帝国大厦",
+    "name_en": "Empire State Building",
+    "country_code": "US",
+    "lat": 40.7484,
+    "lng": -73.9857,
+    "category": "现代地标",
+    "desc": "纽约地标建筑"
+  },
+  {
+    "name": "中央公园",
+    "name_en": "Central Park",
+    "country_code": "US",
+    "lat": 40.7829,
+    "lng": -73.9654,
+    "category": "自然景观",
+    "desc": "纽约标志性城市公园"
+  },
+  {
+    "name": "时代广场",
+    "name_en": "Times Square",
+    "country_code": "US",
+    "lat": 40.758,
+    "lng": -73.9855,
+    "category": "购物商圈",
+    "desc": "纽约最繁华的商业广场"
+  },
+  {
+    "name": "布鲁克林大桥",
+    "name_en": "Brooklyn Bridge",
+    "country_code": "US",
+    "lat": 40.7061,
+    "lng": -73.9969,
+    "category": "历史文化",
+    "desc": "纽约标志性悬索桥"
+  },
+  {
+    "name": "白宫",
+    "name_en": "White House",
+    "country_code": "US",
+    "lat": 38.8977,
+    "lng": -77.0365,
+    "category": "历史文化",
+    "desc": "美国总统官邸"
+  },
+  {
+    "name": "国会大厦",
+    "name_en": "US Capitol",
+    "country_code": "US",
+    "lat": 38.8899,
+    "lng": -77.0091,
+    "category": "历史文化",
+    "desc": "美国国会所在地"
+  },
+  {
+    "name": "林肯纪念堂",
+    "name_en": "Lincoln Memorial",
+    "country_code": "US",
+    "lat": 38.8893,
+    "lng": -77.0502,
+    "category": "历史文化",
+    "desc": "华盛顿标志性纪念建筑"
+  },
+  {
+    "name": "金门大桥",
+    "name_en": "Golden Gate Bridge",
+    "country_code": "US",
+    "lat": 37.8199,
+    "lng": -122.4783,
+    "category": "现代地标",
+    "desc": "旧金山标志性悬索桥"
+  },
+  {
+    "name": "恶魔岛",
+    "name_en": "Alcatraz",
+    "country_code": "US",
+    "lat": 37.8267,
+    "lng": -122.4233,
+    "category": "历史文化",
+    "desc": "旧金山著名监狱遗址"
+  },
+  {
+    "name": "渔人码头",
+    "name_en": "Fishermans Wharf",
+    "country_code": "US",
+    "lat": 37.808,
+    "lng": -122.4177,
+    "category": "海滨度假",
+    "desc": "旧金山热门旅游区"
+  },
+  {
+    "name": "好莱坞",
+    "name_en": "Hollywood",
+    "country_code": "US",
+    "lat": 34.0928,
+    "lng": -118.3287,
+    "category": "现代地标",
+    "desc": "洛杉矶电影业中心"
+  },
+  {
+    "name": "环球影城好莱坞",
+    "name_en": "Universal Studios Hollywood",
+    "country_code": "US",
+    "lat": 34.1381,
+    "lng": -118.3534,
+    "category": "主题乐园",
+    "desc": "洛杉矶主题乐园"
+  },
+  {
+    "name": "迪士尼乐园",
+    "name_en": "Disneyland",
+    "country_code": "US",
+    "lat": 33.8121,
+    "lng": -117.919,
+    "category": "主题乐园",
+    "desc": "世界第一个迪士尼乐园"
+  },
+  {
+    "name": "大峡谷",
+    "name_en": "Grand Canyon",
+    "country_code": "US",
+    "lat": 36.1069,
+    "lng": -112.1129,
+    "category": "自然景观",
+    "desc": "世界自然奇观，科罗拉多大峡谷"
+  },
+  {
+    "name": "黄石公园",
+    "name_en": "Yellowstone",
+    "country_code": "US",
+    "lat": 44.5682,
+    "lng": -110.6475,
+    "category": "自然景观",
+    "desc": "世界第一座国家公园"
+  },
+  {
+    "name": "尼亚加拉瀑布",
+    "name_en": "Niagara Falls",
+    "country_code": "US",
+    "lat": 43.0962,
+    "lng": -79.0377,
+    "category": "自然景观",
+    "desc": "美加边境著名瀑布"
+  },
+  {
+    "name": "夏威夷威基基海滩",
+    "name_en": "Waikiki Beach",
+    "country_code": "US",
+    "lat": 21.2764,
+    "lng": -157.823,
+    "category": "海滨度假",
+    "desc": "夏威夷著名海滩"
+  },
+  {
+    "name": "多伦多CN塔",
+    "name_en": "CN Tower",
+    "country_code": "CA",
+    "lat": 43.6426,
+    "lng": -79.3871,
+    "category": "现代地标",
+    "desc": "多伦多地标电视塔"
+  },
+  {
+    "name": "尼亚加拉大瀑布",
+    "name_en": "Niagara Falls (Canadian Side)",
+    "country_code": "CA",
+    "lat": 43.1012,
+    "lng": -79.0751,
+    "category": "自然景观",
+    "desc": "加方视角的尼亚加拉瀑布"
+  },
+  {
+    "name": "班夫国家公园",
+    "name_en": "Banff National Park",
+    "country_code": "CA",
+    "lat": 51.175,
+    "lng": -115.5683,
+    "category": "自然景观",
+    "desc": "世界自然遗产，洛基山脉明珠"
+  },
+  {
+    "name": "路易斯湖",
+    "name_en": "Lake Louise",
+    "country_code": "CA",
+    "lat": 51.42,
+    "lng": -116.19,
+    "category": "自然景观",
+    "desc": "班夫国家公园内的冰川湖"
+  },
+  {
+    "name": "温哥华史丹利公园",
+    "name_en": "Stanley Park",
+    "country_code": "CA",
+    "lat": 49.3155,
+    "lng": -123.1456,
+    "category": "自然景观",
+    "desc": "温哥华著名城市公园"
+  },
+  {
+    "name": "奇琴伊察玛雅遗址",
+    "name_en": "Chichen Itza",
+    "country_code": "MX",
+    "lat": 20.683,
+    "lng": -88.5686,
+    "category": "历史文化",
+    "desc": "世界新七大奇迹，玛雅文明遗址"
+  },
+  {
+    "name": "特奥蒂瓦坎太阳金字塔",
+    "name_en": "Teotihuacan",
+    "country_code": "MX",
+    "lat": 19.6925,
+    "lng": -98.8445,
+    "category": "历史文化",
+    "desc": "世界文化遗产，阿兹特克古城"
+  },
+  {
+    "name": "墨西哥城宪法广场",
+    "name_en": "Zocalo",
+    "country_code": "MX",
+    "lat": 19.4326,
+    "lng": -99.1332,
+    "category": "历史文化",
+    "desc": "墨西哥城中心广场"
+  },
+  {
+    "name": "里约热内卢基督像",
+    "name_en": "Christ the Redeemer",
+    "country_code": "BR",
+    "lat": -22.9519,
+    "lng": -43.2105,
+    "category": "历史文化",
+    "desc": "世界新七大奇迹，里约地标"
+  },
+  {
+    "name": "伊瓜苏瀑布",
+    "name_en": "Iguazu Falls",
+    "country_code": "BR",
+    "lat": -25.6953,
+    "lng": -54.4367,
+    "category": "自然景观",
+    "desc": "世界最大的瀑布群"
+  },
+  {
+    "name": "亚马逊雨林",
+    "name_en": "Amazon Rainforest",
+    "country_code": "BR",
+    "lat": -3.4653,
+    "lng": -62.2159,
+    "category": "自然景观",
+    "desc": "世界最大的热带雨林"
+  },
+  {
+    "name": "马丘比丘",
+    "name_en": "Machu Picchu",
+    "country_code": "PE",
+    "lat": -13.1631,
+    "lng": -72.545,
+    "category": "历史文化",
+    "desc": "世界新七大奇迹，印加帝国遗址"
+  },
+  {
+    "name": "的的喀喀湖",
+    "name_en": "Lake Titicaca",
+    "country_code": "PE",
+    "lat": -16.1687,
+    "lng": -68.1837,
+    "category": "自然景观",
+    "desc": "世界最高的淡水湖"
+  },
+  {
+    "name": "复活节岛",
+    "name_en": "Easter Island",
+    "country_code": "CL",
+    "lat": -27.105,
+    "lng": -109.367,
+    "category": "历史文化",
+    "desc": "世界文化遗产，神秘石像"
+  },
+  {
+    "name": "布宜诺斯艾利斯博卡区",
+    "name_en": "La Boca",
+    "country_code": "AR",
+    "lat": -34.634,
+    "lng": -58.364,
+    "category": "历史文化",
+    "desc": "布宜诺斯艾利斯著名艺术区"
+  },
+  {
+    "name": "悉尼歌剧院",
+    "name_en": "Sydney Opera House",
+    "country_code": "AU",
+    "lat": -33.8568,
+    "lng": 151.2153,
+    "category": "现代地标",
+    "desc": "世界文化遗产，悉尼标志"
+  },
+  {
+    "name": "悉尼海港大桥",
+    "name_en": "Sydney Harbour Bridge",
+    "country_code": "AU",
+    "lat": -33.8194,
+    "lng": 151.1854,
+    "category": "历史文化",
+    "desc": "悉尼标志性大桥"
+  },
+  {
+    "name": "悉尼塔",
+    "name_en": "Sydney Tower",
+    "country_code": "AU",
+    "lat": -33.869,
+    "lng": 151.208,
+    "category": "现代地标",
+    "desc": "悉尼地标观光塔"
+  },
+  {
+    "name": "邦迪海滩",
+    "name_en": "Bondi Beach",
+    "country_code": "AU",
+    "lat": -33.8915,
+    "lng": 151.2767,
+    "category": "海滨度假",
+    "desc": "悉尼最著名的海滩"
+  },
+  {
+    "name": "蓝山国家公园",
+    "name_en": "Blue Mountains",
+    "country_code": "AU",
+    "lat": -33.7181,
+    "lng": 150.3157,
+    "category": "自然景观",
+    "desc": "世界自然遗产，澳大利亚三姐妹峰"
+  },
+  {
+    "name": "大堡礁",
+    "name_en": "Great Barrier Reef",
+    "country_code": "AU",
+    "lat": -18.2871,
+    "lng": 147.6992,
+    "category": "自然景观",
+    "desc": "世界自然遗产，地球最大的珊瑚礁群"
+  },
+  {
+    "name": "乌鲁鲁（艾尔斯岩）",
+    "name_en": "Uluru",
+    "country_code": "AU",
+    "lat": -25.3453,
+    "lng": 131.0356,
+    "category": "自然景观",
+    "desc": "世界自然遗产，澳大利亚心脏"
+  },
+  {
+    "name": "墨尔本联邦广场",
+    "name_en": "Federation Square",
+    "country_code": "AU",
+    "lat": -37.8187,
+    "lng": 144.969,
+    "category": "现代地标",
+    "desc": "墨尔本标志性公共广场"
+  },
+  {
+    "name": "珀斯",
+    "name_en": "Perth",
+    "country_code": "AU",
+    "lat": -31.9505,
+    "lng": 115.8605,
+    "category": "海滨度假",
+    "desc": "西澳首府"
+  },
+  {
+    "name": "天空塔",
+    "name_en": "Sky Tower",
+    "country_code": "NZ",
+    "lat": -36.8485,
+    "lng": 174.7633,
+    "category": "现代地标",
+    "desc": "奥克兰地标观光塔"
+  },
+  {
+    "name": "皇后镇",
+    "name_en": "Queenstown",
+    "country_code": "NZ",
+    "lat": -45.0312,
+    "lng": 168.6626,
+    "category": "自然景观",
+    "desc": "新西兰冒险之都"
+  },
+  {
+    "name": "米尔福德峡湾",
+    "name_en": "Milford Sound",
+    "country_code": "NZ",
+    "lat": -44.6471,
+    "lng": 167.9149,
+    "category": "自然景观",
+    "desc": "世界自然遗产，新西兰最美峡湾"
+  },
+  {
+    "name": "金字塔",
+    "name_en": "Pyramids of Giza",
+    "country_code": "EG",
+    "lat": 29.9792,
+    "lng": 31.1342,
+    "category": "历史文化",
+    "desc": "世界古代七大奇迹，吉萨金字塔群"
+  },
+  {
+    "name": "狮身人面像",
+    "name_en": "Great Sphinx",
+    "country_code": "EG",
+    "lat": 29.9753,
+    "lng": 31.138,
+    "category": "历史文化",
+    "desc": "金字塔旁的神秘雕像"
+  },
+  {
+    "name": "卡纳克神庙",
+    "name_en": "Karnak Temple",
+    "country_code": "EG",
+    "lat": 25.7188,
+    "lng": 32.6574,
+    "category": "历史文化",
+    "desc": "卢克索神庙群中最大的一座"
+  },
+  {
+    "name": "卢克索神庙",
+    "name_en": "Luxor Temple",
+    "country_code": "EG",
+    "lat": 25.6994,
+    "lng": 32.635,
+    "category": "历史文化",
+    "desc": "古埃及神庙遗址"
+  },
+  {
+    "name": "红海",
+    "name_en": "Red Sea",
+    "country_code": "EG",
+    "lat": 25.0,
+    "lng": 35.0,
+    "category": "海滨度假",
+    "desc": "世界著名潜水胜地"
+  },
+  {
+    "name": "阿布辛贝神庙",
+    "name_en": "Abu Simbel",
+    "country_code": "EG",
+    "lat": 22.3375,
+    "lng": 31.6256,
+    "category": "历史文化",
+    "desc": "世界文化遗产，拉美西斯二世神庙"
+  },
+  {
+    "name": "好望角",
+    "name_en": "Cape of Good Hope",
+    "country_code": "ZA",
+    "lat": -34.3556,
+    "lng": 18.472,
+    "category": "自然景观",
+    "desc": "非洲大陆最南端"
+  },
+  {
+    "name": "桌山",
+    "name_en": "Table Mountain",
+    "country_code": "ZA",
+    "lat": -33.9626,
+    "lng": 18.4093,
+    "category": "自然景观",
+    "desc": "开普敦标志性山脉"
+  },
+  {
+    "name": "克鲁格国家公园",
+    "name_en": "Kruger National Park",
+    "country_code": "ZA",
+    "lat": -24.0,
+    "lng": 31.5,
+    "category": "自然景观",
+    "desc": "世界著名的野生动物保护区"
+  },
+  {
+    "name": "马赛马拉国家公园",
+    "name_en": "Maasai Mara",
+    "country_code": "KE",
+    "lat": -1.5,
+    "lng": 35.0,
+    "category": "自然景观",
+    "desc": "非洲大迁徙发生地"
+  },
+  {
+    "name": "乞力马扎罗山",
+    "name_en": "Mount Kilimanjaro",
+    "country_code": "KE",
+    "lat": -3.0674,
+    "lng": 37.3556,
+    "category": "自然景观",
+    "desc": "非洲最高峰，世界自然遗产"
+  },
+  {
+    "name": "拉巴特哈桑塔",
+    "name_en": "Hassan Tower",
+    "country_code": "MA",
+    "lat": 34.0287,
+    "lng": -6.84,
+    "category": "历史文化",
+    "desc": "历史文化名城拉巴特地标"
+  },
+  {
+    "name": "马拉喀什",
+    "name_en": "Marrakech",
+    "country_code": "MA",
+    "lat": 31.6295,
+    "lng": -7.9811,
+    "category": "历史文化",
+    "desc": "红城，世界文化遗产"
+  },
+  {
+    "name": "拉利贝拉岩石教堂",
+    "name_en": "Lalibela",
+    "country_code": "ET",
+    "lat": 12.0317,
+    "lng": 39.0464,
+    "category": "历史文化",
+    "desc": "世界文化遗产，岩石凿出的教堂"
+  },
+  {
+    "name": "努克",
+    "name_en": "Nuuk",
+    "country_code": "GL",
+    "lat": 64.1836,
+    "lng": -51.7214,
+    "category": "自然景观",
+    "desc": "格陵兰首府，极圈城市"
+  },
+  {
+    "name": "伊卢利萨特冰峡湾",
+    "name_en": "Ilulissat Icefjord",
+    "country_code": "GL",
+    "lat": 70.67,
+    "lng": -52.2,
+    "category": "自然景观",
+    "desc": "世界自然遗产，冰川崩解奇景"
+  },
+  {
+    "name": "安道尔城",
+    "name_en": "Andorra la Vella",
+    "country_code": "AD",
+    "lat": 42.5063,
+    "lng": 1.5218,
+    "category": "自然景观",
+    "desc": "欧洲袖珍小国，滑雪胜地"
+  },
+  {
+    "name": "瓦杜兹城堡",
+    "name_en": "Vaduz Castle",
+    "country_code": "LI",
+    "lat": 47.1367,
+    "lng": 9.5219,
+    "category": "历史文化",
+    "desc": "列支敦士登王室城堡"
+  }
+]
