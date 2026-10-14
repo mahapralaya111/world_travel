@@ -1,0 +1,7 @@
+# 让 GitHub 语言统计把 Python 识别为主语言
+# HTML 页面属于"展示层/文档"，不计入语言占比（不影响网站运行）
+*.html linguist-documentation
+*.css  linguist-documentation
+
+# 明确 Python 参与语言统计
+*.py linguist-detectable=true
