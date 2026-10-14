@@ -7,6 +7,7 @@
 """
 import json
 import re
+import threading
 import time
 import urllib.request
 import urllib.parse
@@ -124,20 +125,22 @@ _INTERESTING = ["opening_hours", "phone", "contact:phone", "website", "contact:w
 
 # 内存缓存：{(lat,lng,radius): (时间戳, POI 列表)}，1 小时过期
 _cache = {}
+_cache_lock = threading.Lock()  # 保护缓存字典的并发读写
 _TTL = 60 * 60
 _CACHE_MAX = 400  # 条目上限，防止长时间运行内存无限增长
 
 
 def _prune_cache():
     """超上限时先清过期项，仍超则整体清空（POI 可随时重新查询）"""
-    if len(_cache) <= _CACHE_MAX:
-        return
-    now = time.time()
-    for k, v in list(_cache.items()):
-        if now - v[0] >= _TTL:
-            _cache.pop(k, None)
-    if len(_cache) > _CACHE_MAX:
-        _cache.clear()
+    with _cache_lock:
+        if len(_cache) <= _CACHE_MAX:
+            return
+        now = time.time()
+        for k, v in list(_cache.items()):
+            if now - v[0] >= _TTL:
+                _cache.pop(k, None)
+        if len(_cache) > _CACHE_MAX:
+            _cache.clear()
 
 
 def _osm_name_tags():
@@ -225,7 +228,8 @@ def nearby():
 
     cn = _is_cn(lat, lng)
     key = ("amap" if cn else "osm", round(lat, 3), round(lng, 3), radius)
-    hit = _cache.get(key)
+    with _cache_lock:
+        hit = _cache.get(key)
     if hit and time.time() - hit[0] < _TTL:
         pois = hit[1]
     else:
@@ -237,7 +241,8 @@ def nearby():
                 pois = _shape(raw.get("elements"))
         except Exception as e:
             return jsonify({"code": 2, "msg": str(e), "data": None}), 502
-        _cache[key] = (time.time(), pois)
+        with _cache_lock:
+            _cache[key] = (time.time(), pois)
         _prune_cache()
 
     return jsonify({"code": 0, "msg": "ok", "data": {
@@ -258,7 +263,8 @@ def detail():
 
     cn = _is_cn(lat, lng)
     key = (("amap" if cn else "osm"), "byname", round(lat, 3), round(lng, 3), name.lower())
-    hit = _cache.get(key)
+    with _cache_lock:
+        hit = _cache.get(key)
     if hit and time.time() - hit[0] < _TTL:
         return jsonify({"code": 0, "msg": "ok", "data": hit[1]})
 
@@ -269,7 +275,8 @@ def detail():
         except Exception as e:
             return jsonify({"code": 2, "msg": str(e), "data": None}), 502
         if best:
-            _cache[key] = (time.time(), best)
+            with _cache_lock:
+                _cache[key] = (time.time(), best)
             _prune_cache()
             return jsonify({"code": 0, "msg": "ok", "data": best})
         return jsonify({"code": 404, "msg": "高德 POI 未匹配到该名称", "data": None}), 404
@@ -293,7 +300,8 @@ def detail():
             return (exact, len(p["name"]), d)
 
         best = min(pois, key=_score)
-        _cache[key] = (time.time(), best)
+        with _cache_lock:
+            _cache[key] = (time.time(), best)
         _prune_cache()
         return best
 

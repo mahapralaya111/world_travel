@@ -2,6 +2,7 @@
 """标志性景点路由：返回精选的全球著名地标数据"""
 import json
 import os
+import threading
 
 from flask import Blueprint, jsonify, request
 
@@ -10,18 +11,20 @@ from config import Config
 landmarks_bp = Blueprint("landmarks", __name__, url_prefix="/api/landmarks")
 
 _cache = {"ts": 0.0, "data": None}
+_cache_lock = threading.Lock()
 
 
 def _load_landmarks():
-    if _cache["data"] is not None:
+    with _cache_lock:
+        if _cache["data"] is not None:
+            return _cache["data"]
+        path = os.path.join(Config.DATA_DIR, "landmarks.json")
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                _cache["data"] = json.load(f)
+        except Exception:
+            _cache["data"] = []
         return _cache["data"]
-    path = os.path.join(Config.DATA_DIR, "landmarks.json")
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            _cache["data"] = json.load(f)
-    except Exception:
-        _cache["data"] = []
-    return _cache["data"]
 
 
 def ok(data=None, msg="success"):

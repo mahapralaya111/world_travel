@@ -2,3 +2,4 @@ Flask>=3.0
 Werkzeug>=3.0
 pymysql>=1.1
 pypinyin>=0.51
+waitress>=3.0

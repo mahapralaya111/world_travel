@@ -3,6 +3,23 @@ chcp 65001 >nul
 title 国际旅游规划助手 - 后端服务
 cd /d %~dp0server
 
+::: ============================================================
+::: MySQL 密码【绝对不要写在本文件里】（本文件会提交到 GitHub，会泄露）
+::: 二选一：
+:::   1) 在系统环境变量里设置 MYSQL_PASSWORD
+:::   2) 新建 server\.env.local（已在 .gitignore 中，不会被提交），内容一行：
+:::        MYSQL_PASSWORD=你的真实密码
+::: ============================================================
+if exist ".env.local" (
+    for /f "usebackq tokens=1,* delims==" %%a in (".env.local") do (
+        if not "%%a"=="" set "%%a=%%b"
+    )
+)
+if "%MYSQL_PASSWORD%"=="" (
+    echo [提示] 未设置 MYSQL_PASSWORD，将以空密码连接 MySQL。
+    echo        若连不上数据库，请设置环境变量或创建 server\.env.local（详见本脚本注释）
+)
+
 echo.
 echo  ============================================
 echo    国际旅游规划助手 - 后端服务启动中...

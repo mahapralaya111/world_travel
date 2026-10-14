@@ -53,6 +53,9 @@
 | `notes` | 游记表 | user_id, trip_id, title, content, is_public, view_count |
 | `favorites` | 收藏表 | user_id, item_key, item_type, city_name, sight_name, lat, lng |
 | `cities` | 城市表 | country_code, name, name_en, name_local, lat, lng, sights, is_capital, population |
+| `trip_plans` | AI 行程方案表 | trip_id(唯一), plan_data(JSON), created_at |
+| `share_tokens` | 分享令牌表 | token, owner_id, trip_id, scope, snapshot(JSON), expire_at |
+| `sync_state` | 同步版本表（乐观锁） | trip_id, country_id(联合主键), rev, last_client_id |
 
 ### 核心接口一览
 
@@ -89,7 +92,7 @@
 ```bash
 pip install -r requirements.txt
 ```
-> 依赖：Flask / Werkzeug（Web 框架）、pypinyin（城市拼音搜索）、pymysql（可选，切换 MySQL 时使用）。
+> 依赖：Flask / Werkzeug（Web 框架）、waitress（生产级 WSGI 服务器）、pypinyin（城市拼音搜索）、pymysql（切换 MySQL 时使用）。
 > JWT 为自研实现（标准库 HMAC-SHA256）。
 
 ### 启动系统
@@ -128,20 +131,23 @@ AAAworldtravel/
 │   └── js/
 │       └── api.js          # 前端 API 客户端（统一封装）
 ├── server/
-│   ├── app.py              # Flask 应用入口（含前端托管）
-│   ├── config.py           # 全局配置（数据库/密钥）
-│   ├── database.py         # 数据库访问层（SQLite/MySQL）
-│   ├── models.py           # 数据模型（建表 + 城市数据导入）
+│   ├── app.py              # Flask 应用入口（含前端托管 / waitress 生产服务器）
+│   ├── config.py           # 全局配置（数据库/密钥/AI 并发参数）
+│   ├── database.py         # 数据库访问层（SQLite/MySQL，WAL/连接复用）
+│   ├── models.py           # 数据模型（建表 + 索引 + 城市数据导入）
 │   ├── auth.py             # JWT 认证模块（自研实现）
+│   ├── ai_planner.py       # AI 行程规划（大模型调用）
+│   ├── ai_gate.py          # 【新增】AI 并发闸门 + 结果缓存 + 请求去重
+│   ├── rate_limit.py       # 【新增】接口限流（防刷）
 │   ├── utils.py            # 工具函数（距离计算/模糊搜索评分）
 │   ├── routes/
 │   │   ├── auth_routes.py  # 认证路由
-│   │   ├── trip_routes.py  # 行程/批注/路线路由
+│   │   ├── trip_routes.py  # 行程/批注/路线路由（含乐观锁同步）
 │   │   ├── city_routes.py  # 城市搜索路由
 │   │   ├── note_routes.py  # 游记路由
 │   │   └── stats_routes.py # 统计路由
 │   └── data/
-│       ├── cities.json     # 城市基础数据（34150 个城市，GeoNames 全量）
+│       ├── cities.json     # 城市基础数据（本地生成，不入库；见下方"城市数据"说明）
 │       └── country_codes.json  # ISO 国家码映射（数字码 ↔ 两位码）
 ├── scripts/
 │   ├── rebuild_cities.py   # 清洗重建城市数据（合并重复/首都标记）
@@ -204,9 +210,56 @@ python server/app.py
 
 ---
 
+## 🚀 生产部署与多用户并发
+
+项目默认已针对"多用户同时使用"做了处理：
+
+| 关注点 | 方案 |
+|--------|------|
+| Web 服务器 | 启动时优先使用 **waitress**（生产级多线程 WSGI，`threads=8`）；未安装则退回 Flask 开发服务器并提示安装 |
+| 大模型并发 | `server/ai_gate.py` 用信号量限制同时调用模型的数量，超出排队；相同入参命中缓存；并发相同请求自动合并（去重） |
+| 大模型超时/重试 | 单次超时 `AI_TIMEOUT`（默认 180s），网络类错误指数退避重试；4xx 不重试 |
+| 接口防刷 | `server/rate_limit.py` 滑动窗口限流（AI 规划：5 分钟 / IP 10 次） |
+| SQLite 并发 | 开启 WAL + `busy_timeout=15s`，读写不互相阻塞，避免 `database is locked` |
+| MySQL 并发 | 默认自动提交（避免长事务读旧快照）+ 建连/读写超时 + `ping` 重连 + 线程本地连接复用 |
+| 多端同步 | `sync_state` 乐观锁：多标签页/多设备同时改同一国家时，冲突方返回 409 并自动重载云端数据，杜绝"后写覆盖先写" |
+| 查询性能 | 启动时幂等补齐索引（annotations/routes/trips/cities/notes/favorites） |
+
+### 环境变量（可选，均有合理默认值）
+
+```bash
+# AI 并发治理（本地 Ollama 建议保持 1~2；云端 API 可放宽）
+set AI_MAX_CONCURRENT=2      # 同时调用模型的最大请求数
+set AI_QUEUE_TIMEOUT=30      # 并发满时排队等待上限（秒）
+set AI_CACHE_TTL=1800        # 相同入参结果缓存（秒），0 表示关闭
+set AI_TIMEOUT=180           # 单次模型调用超时（秒）
+
+# 部署收紧
+set HOST=0.0.0.0             # 对外提供服务（会自动关闭 Flask 调试器）
+set ALLOWED_ORIGINS=https://your-domain.com   # 收紧跨域（默认 *）
+```
+
+### 数据库密码安全
+
+> ⚠️ **不要把 MySQL 密码写进 `start.bat`**（该文件会提交到 GitHub，会泄露）。
+> 推荐做法：设置系统环境变量 `MYSQL_PASSWORD`，或创建 `server/.env.local`（已被 `.gitignore` 忽略）：
+> ```
+> MYSQL_PASSWORD=你的真实密码
+> ```
+
+### 城市数据（首次部署必看）
+
+城市数据 `server/data/cities.json` 体积较大（约 7.4MB），**不纳入 Git 仓库**。首次部署若城市表为空，启动日志会提示：
+
+```bash
+python scripts/import_all_cities.py   # 从 GeoNames 下载并生成 cities.json + 导入数据库
+```
+
+---
+
 ## 📝 其他说明
 
 - 地图底图使用 CartoDB Positron（免费商用），Leaflet / TopoJSON 通过多 CDN 容灾加载
-- 城市数据（34150 个）来自 GeoNames 全球城市数据库（人口≥1.5万），含中英文名、首都标记、人口与景点数据，启动时自动导入数据库
+- 城市数据来自 GeoNames 全球城市数据库（人口≥1.5万），含中英文名、首都标记、人口与景点数据；首次需运行 `scripts/import_all_cities.py` 生成并导入（见上方说明）
 - 未登录状态（游客模式）仍可使用全部地图功能，数据存于浏览器 localStorage
-- AI 行程规划需在 `server/config.py` 中配置 `AI_API_KEY`（DeepSeek），未配置时面板会友好提示
+- AI 行程规划默认使用本地 Ollama；也可在 `server/config.py` 通过环境变量切换 DeepSeek / 通义千问 / 智谱，未配置时面板会友好提示

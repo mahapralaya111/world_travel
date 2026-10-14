@@ -12,10 +12,24 @@ AI 智能出行规划 - 大模型调用封装
 import json
 import os
 import re
+import time
 import urllib.request
 import urllib.error
 
 from config import Config
+import ai_gate
+
+# ---------------------------------------------------------------------------
+# 并发治理闸门：限制同时打模型的请求数 + 结果缓存 + in-flight 去重
+# （多用户同时使用时，避免本地 Ollama 串行排队导致大面积超时）
+# ---------------------------------------------------------------------------
+_gate = ai_gate._Gate(
+    max_concurrent=Config.AI_MAX_CONCURRENT,
+    wait_timeout=Config.AI_QUEUE_TIMEOUT,
+    cache_ttl=Config.AI_CACHE_TTL,
+)
+# 暴露排队超时异常类型，供路由层识别并返回友好提示
+AIBusy = ai_gate._Busy
 
 # ---------------------------------------------------------------------------
 # 厂商预置配置（base_url 均为 OpenAI 兼容接口根地址，不含 /v1）
@@ -83,14 +97,22 @@ def is_configured() -> bool:
     return bool(key)
 
 
-def _chat_once(messages, temperature=0.7, max_tokens=4096, timeout=180):
-    """调用一次 Chat Completions，返回模型回复文本"""
+def _chat_once(messages, temperature=0.7, max_tokens=4096, timeout=None, retries=2):
+    """调用一次 Chat Completions，返回模型回复文本
+
+    - timeout 缺省取 Config.AI_TIMEOUT
+    - 网络类错误（连接失败/超时）自动重试 retries 次（指数退避）；
+      HTTP 4xx（参数/鉴权错误）不重试，直接抛出，避免无意义重试
+    """
     name, prov = _resolve_provider()
     need_key = prov.get("need_key", False)
     key = (Config.AI_API_KEY or "").strip()
 
     if need_key and not key:
         raise RuntimeError("未配置大模型 API Key")
+
+    if timeout is None:
+        timeout = Config.AI_TIMEOUT
 
     url = prov["base_url"] + prov["chat_path"]
     payload = {
@@ -111,23 +133,30 @@ def _chat_once(messages, temperature=0.7, max_tokens=4096, timeout=180):
     if need_key and key:
         headers["Authorization"] = "Bearer " + key
 
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers=headers,
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            body = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        detail = e.read().decode("utf-8", errors="ignore")[:300]
-        raise RuntimeError(f"大模型接口错误 HTTP {e.code}: {detail}") from e
-    except urllib.error.URLError as e:
-        raise RuntimeError(
-            f"无法连接大模型服务 {prov['base_url']}（provider={name}）。"
-            f"若使用本地 Ollama，请先执行 'ollama serve' 启动服务。错误: {e.reason}"
-        ) from e
+    body_bytes = json.dumps(payload).encode("utf-8")
+
+    last_err = None
+    for attempt in range(max(1, retries + 1)):
+        req = urllib.request.Request(url, data=body_bytes, headers=headers, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                body = json.loads(resp.read().decode("utf-8"))
+            break
+        except urllib.error.HTTPError as e:
+            # 4xx（如 401 鉴权失败 / 400 参数错误）重试无意义，直接失败
+            detail = e.read().decode("utf-8", errors="ignore")[:300]
+            raise RuntimeError(f"大模型接口错误 HTTP {e.code}: {detail}") from e
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
+            # 连接失败 / 读超时：可重试
+            last_err = e
+            if attempt < retries:
+                time.sleep(min(2 ** attempt, 5))
+                continue
+            reason = getattr(e, "reason", e)
+            raise RuntimeError(
+                f"无法连接大模型服务 {prov['base_url']}（provider={name}，已重试 {retries} 次）。"
+                f"若使用本地 Ollama，请先执行 'ollama serve' 启动服务。错误: {reason}"
+            ) from e
 
     try:
         return body["choices"][0]["message"]["content"]
@@ -264,15 +293,20 @@ def parse_intent_to_json(user_text):
     """
     if not is_configured():
         raise RuntimeError("未配置大模型 API Key")
-    messages = [
-        {"role": "system", "content": INTENT_SYSTEM_PROMPT},
-        {"role": "user", "content": str(user_text)[:800]},
-    ]
-    text = _chat_once(messages, temperature=0.2, max_tokens=500)
-    data = _extract_json(text)
-    if not isinstance(data, dict) or "intent" not in data:
-        raise RuntimeError("意图解析失败：未返回有效 intent")
-    return data
+
+    def _do():
+        messages = [
+            {"role": "system", "content": INTENT_SYSTEM_PROMPT},
+            {"role": "user", "content": str(user_text)[:800]},
+        ]
+        text = _chat_once(messages, temperature=0.2, max_tokens=500)
+        data = _extract_json(text)
+        if not isinstance(data, dict) or "intent" not in data:
+            raise RuntimeError("意图解析失败：未返回有效 intent")
+        return data
+
+    # 相同用户输入直接命中缓存 / 并发去重，避免重复打模型
+    return _gate.run(ai_gate.make_key("intent", str(user_text)[:800]), _do)
 
 
 def _normalize_place(name):
@@ -363,32 +397,37 @@ def generate_travel_plan(days=7, budget=10000, month="6月", travelers=2,
     pref = preferences.strip() or "无特别偏好，希望获得均衡的经典行程"
     month_t = str(month) + "月" if str(month).isdigit() else str(month)
 
-    user_msg = USER_TEMPLATE.format(
-        month=month_t, season=season, days=days, budget=budget,
-        travelers=travelers, departure=departure, preferences=pref,
-    )
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": user_msg},
-    ]
-    text = _chat_once(messages)
-    data = _extract_json(text)
+    def _do():
+        user_msg = USER_TEMPLATE.format(
+            month=month_t, season=season, days=days, budget=budget,
+            travelers=travelers, departure=departure, preferences=pref,
+        )
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_msg},
+        ]
+        text = _chat_once(messages)
+        data = _extract_json(text)
 
-    # 简单校验
-    if "destinations" not in data:
-        raise RuntimeError("大模型未返回有效目的地数据")
+        # 简单校验
+        if "destinations" not in data:
+            raise RuntimeError("大模型未返回有效目的地数据")
 
-    # 后处理：去重景点（即使 prompt 已约束，LLM 仍可能偶尔重复，作为安全网）
-    data, removed = _dedupe_itinerary(data)
-    if removed:
-        tips = data.get("tips")
-        if isinstance(tips, list):
-            tips.append(f"已自动去除 {removed} 处重复景点并替换为自由活动时段。")
+        # 后处理：去重景点（即使 prompt 已约束，LLM 仍可能偶尔重复，作为安全网）
+        data, removed = _dedupe_itinerary(data)
+        if removed:
+            tips = data.get("tips")
+            if isinstance(tips, list):
+                tips.append(f"已自动去除 {removed} 处重复景点并替换为自由活动时段。")
 
-    # 后处理：城市停留过多提示
-    over_tip = _check_city_overstay(data, days)
-    if over_tip:
-        summary = str(data.get("summary", ""))
-        data["summary"] = (summary + " " + over_tip).strip()
+        # 后处理：城市停留过多提示
+        over_tip = _check_city_overstay(data, days)
+        if over_tip:
+            summary = str(data.get("summary", ""))
+            data["summary"] = (summary + " " + over_tip).strip()
 
-    return data
+        return data
+
+    # 相同入参命中缓存 / 并发去重；超出并发则排队，等待过久由 AIBusy 抛出
+    key = ai_gate.make_key("plan", days, budget, month, travelers, departure, pref)
+    return _gate.run(key, _do)

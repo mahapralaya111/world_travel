@@ -152,7 +152,7 @@ if __name__ == "__main__":
     print(f"\n[国际旅游规划助手] 后端启动: {url}")
     print(f"[国际旅游规划助手] 数据库: {Config.DB_TYPE.upper()} | 调试模式: {'开' if Config.DEBUG else '关'}\n")
 
-    # 服务器就绪后自动打开浏览器（延迟 1.5 秒，等 Flask 完成监听）
+    # 服务器就绪后自动打开浏览器（延迟 1.5 秒，等服务器完成监听）
     def _open_browser():
         time.sleep(1.5)
         try:
@@ -162,5 +162,16 @@ if __name__ == "__main__":
 
     threading.Thread(target=_open_browser, daemon=True).start()
 
-    # use_reloader=False：避免多进程导致静态资源/数据库连接冲突
-    app.run(host=Config.HOST, port=Config.PORT, debug=Config.DEBUG, use_reloader=False)
+    # 优先使用 waitress（生产级 WSGI：多线程、更稳定、无开发服务器告警），
+    # 支持多用户并发；未安装时退回 Flask 开发服务器（仅建议本机调试）。
+    try:
+        from waitress import serve
+        print("[国际旅游规划助手] 服务器: waitress（生产级多线程，threads=8）")
+        # channel_timeout 必须大于 AI 单次最长耗时（含排队），否则长请求会被服务器掐断
+        serve(app, host=Config.HOST, port=Config.PORT, threads=8,
+              channel_timeout=Config.AI_TIMEOUT + Config.AI_QUEUE_TIMEOUT * 2 + 60)
+    except ImportError:
+        print("[国际旅游规划助手] 服务器: Flask 开发服务器（建议执行 pip install waitress 以支持多用户）")
+        # use_reloader=False：避免多进程导致静态资源/数据库连接冲突
+        app.run(host=Config.HOST, port=Config.PORT, debug=Config.DEBUG,
+                use_reloader=False, threaded=True)

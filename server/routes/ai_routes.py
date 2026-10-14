@@ -7,8 +7,13 @@ AI 智能出行规划路由
 from flask import Blueprint, request, jsonify
 
 import ai_planner
+from rate_limit import allow, client_ip
 
 ai_bp = Blueprint("ai", __name__, url_prefix="/api/ai")
+
+# 限流参数：同一 IP 5 分钟内最多发起 10 次 AI 规划（模型调用昂贵，防滥用）
+_AI_PLAN_MAX = 10
+_AI_PLAN_WINDOW = 300
 
 
 def ok(data=None, msg="success"):
@@ -53,6 +58,11 @@ def ai_plan():
     返回: 结构化规划（目的地/交通/住宿/行程/美食/预算/贴士）
     """
     data = request.get_json(silent=True) or {}
+
+    # ---- 限流：防止脚本/游客恶意刷 AI 接口（模型调用昂贵） ----
+    ip = client_ip()
+    if not allow(f"ai_plan:{ip}", _AI_PLAN_MAX, _AI_PLAN_WINDOW):
+        return fail("AI 规划请求过于频繁，请 5 分钟后再试", code=429, http=429)
 
     # ---- 参数清洗与校验 ----
     try:
@@ -106,6 +116,9 @@ def ai_plan():
             days=days, budget=budget, month=month,
             travelers=travelers, departure=departure, preferences=preferences,
         )
+    except ai_planner.AIBusy:
+        # 并发已满且排队超时：提示用户稍后重试（而不是 500）
+        return fail("当前使用 AI 规划的用户较多，请稍后重试", code=4, http=503)
     except Exception as e:
         return fail(f"AI 规划失败：{e}", code=3)
 

@@ -73,6 +73,27 @@ class Config:
     # 本地 Ollama 默认: AI_BASE_URL=http://127.0.0.1:11434/v1
     AI_BASE_URL = os.environ.get("AI_BASE_URL", "")
     AI_MODEL = os.environ.get("AI_MODEL", "")
+    # 单次模型调用超时（秒）
+    try:
+        AI_TIMEOUT = int(os.environ.get("AI_TIMEOUT", 180))
+    except (TypeError, ValueError):
+        AI_TIMEOUT = 180
+    # ---------- AI 并发治理（多用户同时使用的关键） ----------
+    # 同时打模型的最大请求数：本地 Ollama 建议 1~2；云端 API 可适当放宽
+    try:
+        AI_MAX_CONCURRENT = int(os.environ.get("AI_MAX_CONCURRENT", 2))
+    except (TypeError, ValueError):
+        AI_MAX_CONCURRENT = 2
+    # 排队等待上限（秒）：并发已满时最多等这么久，超时则快速失败提示
+    try:
+        AI_QUEUE_TIMEOUT = int(os.environ.get("AI_QUEUE_TIMEOUT", 30))
+    except (TypeError, ValueError):
+        AI_QUEUE_TIMEOUT = 30
+    # 相同入参的结果缓存有效期（秒）；设为 0 可关闭缓存
+    try:
+        AI_CACHE_TTL = int(os.environ.get("AI_CACHE_TTL", 1800))
+    except (TypeError, ValueError):
+        AI_CACHE_TTL = 1800
 
     # ---------- 高德开放平台（境内地图/POI/天气，双地图方案） ----------
     # 注册 https://console.amap.com 创建应用后填入；留空则境内也走国际方案

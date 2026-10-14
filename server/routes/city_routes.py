@@ -2,6 +2,7 @@
 """城市路由：多语言搜索 + 城市列表"""
 import json
 import os
+import threading
 import time
 
 from flask import Blueprint, jsonify, request
@@ -102,6 +103,7 @@ def _region_hit(kws, name_l: str, alias_l: str) -> bool:
 # ---------------------------------------------------------------------------
 _CACHE = {"ts": 0.0, "items": None}
 CACHE_TTL = 120  # 秒
+_CACHE_LOCK = threading.Lock()  # 保护缓存刷新，避免并发重复全表加载
 
 
 def _load_city_cache():
@@ -111,36 +113,42 @@ def _load_city_cache():
     if cache["items"] is not None and now - cache["ts"] < CACHE_TTL:
         return cache["items"]
 
-    rows = query_all(
-        "SELECT id, country_code, country_zh, country_en, name, name_en, name_local, lat, lng, sights, "
-        "is_capital, population "
-        "FROM cities", ())
+    # 双检锁：并发请求只有一个线程真正查库+预计算拼音，其余线程等待后直接复用
+    with _CACHE_LOCK:
+        now = time.time()
+        if cache["items"] is not None and now - cache["ts"] < CACHE_TTL:
+            return cache["items"]
 
-    # 检测拼音支持（缓存中预计算所有城市拼音，避免搜索时重复转换）
-    has_py = False
-    try:
-        from pypinyin import lazy_pinyin  # noqa: F401
-        has_py = True
-    except Exception:
-        pass
+        rows = query_all(
+            "SELECT id, country_code, country_zh, country_en, name, name_en, name_local, lat, lng, sights, "
+            "is_capital, population "
+            "FROM cities", ())
 
-    items = []
-    if has_py:
-        from pypinyin import lazy_pinyin
-        for r in rows:
-            name = r["name"] or ""
-            alias_raw = " | ".join(filter(None, [r["name_en"], r["name_local"], r["country_zh"], r["country_en"]]))
-            items.append((r, name.lower(), alias_raw.lower(), alias_raw,
-                          "".join(lazy_pinyin(name)).lower(), _sights_lower(r)))
-    else:
-        for r in rows:
-            name = r["name"] or ""
-            alias_raw = " | ".join(filter(None, [r["name_en"], r["name_local"], r["country_zh"], r["country_en"]]))
-            items.append((r, name.lower(), alias_raw.lower(), alias_raw, "", _sights_lower(r)))
+        # 检测拼音支持（缓存中预计算所有城市拼音，避免搜索时重复转换）
+        has_py = False
+        try:
+            from pypinyin import lazy_pinyin  # noqa: F401
+            has_py = True
+        except Exception:
+            pass
 
-    cache["ts"] = now
-    cache["items"] = items
-    return items
+        items = []
+        if has_py:
+            from pypinyin import lazy_pinyin
+            for r in rows:
+                name = r["name"] or ""
+                alias_raw = " | ".join(filter(None, [r["name_en"], r["name_local"], r["country_zh"], r["country_en"]]))
+                items.append((r, name.lower(), alias_raw.lower(), alias_raw,
+                              "".join(lazy_pinyin(name)).lower(), _sights_lower(r)))
+        else:
+            for r in rows:
+                name = r["name"] or ""
+                alias_raw = " | ".join(filter(None, [r["name_en"], r["name_local"], r["country_zh"], r["country_en"]]))
+                items.append((r, name.lower(), alias_raw.lower(), alias_raw, "", _sights_lower(r)))
+
+        cache["ts"] = time.time()
+        cache["items"] = items
+        return items
 
 
 def _sights_lower(row) -> str:

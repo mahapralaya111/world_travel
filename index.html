@@ -414,6 +414,16 @@
         }
         .tool-btn:hover { background: rgba(74,158,255,0.25); border-color: var(--accent); transform: scale(1.05); }
         .tool-btn.active { background: var(--accent); border-color: var(--accent); }
+        /* 国家视图下 🌐 按钮视觉强调：红框脉冲，让用户一眼识别"退出国家视图" */
+        .tool-btn.country-exit {
+            background: rgba(255,82,82,0.85); border-color: #ff5252;
+            animation: pulse-exit 1.8s ease-in-out infinite;
+        }
+        .tool-btn.country-exit:hover { background: #ff5252; border-color: #ff5252; }
+        @keyframes pulse-exit {
+            0%,100% { box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 4px 24px rgba(255,82,82,0.65); }
+        }
         .tool-btn .tooltip {
             position: absolute; right: 58px; background: #1b1b2f; color: #e0e0e0;
             padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
@@ -2186,6 +2196,33 @@
     let cloudReady = false;         // 云端行程数据是否已成功加载（加载完成前禁止 sync，防止本地旧数据覆盖云端）
     let pendingSyncTimer = null;    // 同步防抖定时器
     let serverCountryIds = new Set();  // 后端数据库中当前行程已存在的国家集合
+    let syncRevs = {};              // { countryId: rev } 各国家同步版本号（乐观锁，防多端覆盖）
+
+    // 标签页标识：用 sessionStorage 保证同一标签页一个 id、不同标签页不同 id。
+    // 服务端用它区分"同一标签页的并发写"（不算冲突）与"其他标签页/设备的写"（冲突，拒绝覆盖）。
+    let clientId = (function() {
+        try {
+            let cid = sessionStorage.getItem('travel_planner_client_id');
+            if (!cid) {
+                cid = 'c_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+                sessionStorage.setItem('travel_planner_client_id', cid);
+            }
+            return cid;
+        } catch (e) {
+            return 'c_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+        }
+    })();
+
+    // 同步冲突处理：该国家已在其他窗口被更新 → 提示并重新拉取云端数据，避免继续覆盖
+    let _conflictNotifiedAt = 0;
+    function handleSyncConflict(msg) {
+        const now = Date.now();
+        if (now - _conflictNotifiedAt < 8000) return;  // 避免同一波冲突反复弹提示
+        _conflictNotifiedAt = now;
+        if (window.toast) toast(msg || '该国家数据已在其他窗口更新，已重新加载云端数据', true);
+        else console.warn('[sync] conflict:', msg);
+        try { loadCurrentTripData(); } catch (e) { console.warn(e); }
+    }
 
     function loadAllData() {
         // 登录后：优先返回后端加载的内存数据（云端数据为权威）
@@ -2297,6 +2334,8 @@
                 const payload = {
                     country_id: countryId,
                     country_name: getCountryNameZhById(countryId),
+                    base_rev: (syncRevs[countryId] || 0),
+                    client_id: clientId,
                     annotations: ((countryData && countryData.annotations) || []).map(function(a) {
                         return {
                             client_id: a.id, title: a.title, content: a.content || '',
@@ -2313,7 +2352,14 @@
                     }),
                 };
                 API.syncCountry(tripId, payload).then(function(res) {
-                    if (res && res.code !== 0) console.warn('同步失败:', res.msg);
+                    if (!res) return;
+                    if (res.code === 0) {
+                        // 记录最新版本号，供下次同步带 base_rev
+                        if (res.data && typeof res.data.rev === 'number') syncRevs[countryId] = res.data.rev;
+                        return;
+                    }
+                    if (res.code === 409) { handleSyncConflict(res.msg); return; }
+                    console.warn('同步失败:', res.msg);
                 }).catch(function(e) { console.warn('同步异常:', e); });
             });
             serverCountryIds = new Set(localCountryIds);
@@ -3441,8 +3487,10 @@
         renderCityList(countryId);
         addCityMarkers(countryId);
         document.getElementById('btnBackWorld').style.display = 'flex';
-        document.getElementById('statusBar').textContent = `📍 正在规划：${nameZh}`;
-        // 进入国家视图后强制恢复默认光标（防止 hover 残留 pointer）
+        // 浮动工具栏 🌐 按钮在国家视图下视觉强调（红框脉冲），让用户一眼识别"退出"
+        document.getElementById('btnZoomWorld').classList.add('country-exit');
+        document.getElementById('statusBar').textContent = `📍 正在规划：${nameZh} · 按 ESC 或点 🌐 退出`;
+        // 进入国家视图后强制恢复默认光标（防止 hover 拼留 pointer）
         document.getElementById('map').style.cursor = '';
     }
 
@@ -3502,6 +3550,8 @@
         document.getElementById('currentCountry').textContent = '世界地图';
         document.getElementById('currentCountry').className = 'country-display world';
         document.getElementById('btnBackWorld').style.display = 'none';
+        // 退出国家视图：移除 🌐 按钮的视觉强调
+        document.getElementById('btnZoomWorld').classList.remove('country-exit');
         document.getElementById('statusBar').textContent = '🌐 世界视图 — 点击国家开始规划';
         document.getElementById('annotationCount').textContent = '';
         document.getElementById('routeCount').textContent = '';
@@ -4272,6 +4322,7 @@
             try {
                 const payload = {
                     country_id: String(countryId),
+                    base_rev: (syncRevs[String(countryId)] || 0),
                     annotations: (getCountryData(countryId).annotations || []),
                     routes: (getCountryData(countryId).routes || []).map(r => ({
                         name: r.name,
@@ -4282,10 +4333,14 @@
                 };
                 const res = await API.syncCountry(useTripId, payload);
                 if (res.code === 0) {
+                    if (res.data && typeof res.data.rev === 'number') syncRevs[String(countryId)] = res.data.rev;
                     const tripName = (tripListCache.find(t => String(t.id) === String(useTripId)) || {}).name || '';
                     syncMsg = tripName ? `，已同步到行程「${tripName}」` : '，已同步到云端';
                     if (!memoryData) memoryData = {};
                     memoryData[countryId] = getCountryData(countryId);
+                } else if (res.code === 409) {
+                    syncMsg = '，该国家数据已在其他窗口更新，已重新加载云端数据';
+                    handleSyncConflict(res.msg);
                 } else {
                     syncMsg = '，云端同步失败：' + (res.msg || '未知错误');
                 }
@@ -5278,10 +5333,16 @@
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
+                // 记录 ESC 触发前是否有 modal 打开（modal 优先级高于国家视图退出）
+                const anyModalOpen = ['annotationModal','routeModal','shareModal','importModal']
+                    .some(function(id) { return document.getElementById(id).classList.contains('show'); });
                 hideAnnotationModal();
                 hideRouteModal();
-                if (state.drawingLine) {
-                    // Cancel drawing handled by drawing system
+                // 画线中：交给画线系统（cancelLineDrawing）处理，不退出国家视图
+                if (state.drawingLine) return;
+                // 无 modal 打开 + 处于国家视图 → ESC 退出国家视图
+                if (!anyModalOpen && state.currentView === 'country' && state.activeCountryId) {
+                    backToWorld();
                 }
             }
             // B = back to world
@@ -5443,6 +5504,12 @@
         });
         memoryData = merged;
         serverCountryIds = new Set(Object.keys(merged));
+        // 记录各国家同步版本号（乐观锁基准），后续同步带上 base_rev，避免多端覆盖
+        syncRevs = {};
+        Object.keys(data.sync_revs || {}).forEach(k => {
+            const v = Number(data.sync_revs[k]);
+            if (!isNaN(v)) syncRevs[String(k)] = v;
+        });
         cloudReady = true;   // 云端数据已就绪，此后才允许 sync
         // 刷新地图：国家高亮色 + 当前视图重新渲染
         refreshCountryColors();

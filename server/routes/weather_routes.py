@@ -3,6 +3,7 @@
 - /api/weather?lat=&lng=&days=7  按经纬度返回未来 N 天预报
 """
 import json
+import threading
 import time
 import urllib.request
 import urllib.parse
@@ -40,20 +41,22 @@ _AMAP_EMOJI = {
 }
 
 _cache = {}
+_cache_lock = threading.Lock()  # 保护缓存字典的并发读写
 _TTL = 30 * 60
 _CACHE_MAX = 500  # 缓存条目上限，防止长时间运行内存无限增长
 
 
 def _prune_cache():
     """超过上限时先清过期项，仍超上限则整体清空（天气数据可随时重取）"""
-    if len(_cache) <= _CACHE_MAX:
-        return
-    now = time.time()
-    for k, v in list(_cache.items()):
-        if now - v[0] >= _TTL:
-            _cache.pop(k, None)
-    if len(_cache) > _CACHE_MAX:
-        _cache.clear()
+    with _cache_lock:
+        if len(_cache) <= _CACHE_MAX:
+            return
+        now = time.time()
+        for k, v in list(_cache.items()):
+            if now - v[0] >= _TTL:
+                _cache.pop(k, None)
+        if len(_cache) > _CACHE_MAX:
+            _cache.clear()
 
 
 # ---------- 工具 ----------
@@ -234,7 +237,8 @@ def get_weather():
 
     cn = _is_cn(lat, lng)
     key = (("amap" if cn else "om"), round(lat, 2), round(lng, 2), days)
-    hit = _cache.get(key)
+    with _cache_lock:
+        hit = _cache.get(key)
     if hit and time.time() - hit[0] < _TTL:
         return jsonify({"code": 0, "msg": "ok", "data": hit[1]})
 
@@ -263,7 +267,8 @@ def get_weather():
     except Exception as e:
         return jsonify({"code": 2, "msg": "天气服务请求失败: %s" % e, "data": None}), 502
 
-    _cache[key] = (time.time(), data)
+    with _cache_lock:
+        _cache[key] = (time.time(), data)
     _prune_cache()
     return jsonify({"code": 0, "msg": "ok", "data": data})
 

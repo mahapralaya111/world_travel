@@ -148,7 +148,69 @@ TABLES = {
             FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
         )
     """,
+    # 乐观锁版本表：记录"行程+国家"粒度的同步版本号。
+    # 多端/多标签页同时同步同一国家时，版本不匹配即拒绝，避免后写覆盖先写导致数据丢失。
+    "sync_state": """
+        CREATE TABLE IF NOT EXISTS sync_state (
+            trip_id        INTEGER NOT NULL,
+            country_id     VARCHAR(64) NOT NULL,
+            rev            INTEGER NOT NULL DEFAULT 0,
+            last_client_id VARCHAR(64) DEFAULT '',
+            updated_at     TEXT DEFAULT (datetime('now','localtime')),
+            PRIMARY KEY (trip_id, country_id)
+        )
+    """,
 }
+
+# ---------------------------------------------------------------------------
+# 索引：多用户/数据量增长后，避免全表扫描（幂等，每次启动补齐缺失的索引）
+# 说明：MySQL 的 TEXT 列必须带前缀长度才能建索引，故 SQLite / MySQL 列表达式分开写
+# ---------------------------------------------------------------------------
+INDEXES = [
+    # (索引名, 表名, SQLite 列表达式, MySQL 列表达式)
+    ("idx_annotations_trip",        "annotations", "trip_id",            "trip_id"),
+    ("idx_annotations_trip_country", "annotations", "trip_id, country_id", "trip_id, country_id(32)"),
+    ("idx_routes_trip",             "routes",      "trip_id",            "trip_id"),
+    ("idx_routes_trip_country",     "routes",      "trip_id, country_id", "trip_id, country_id(32)"),
+    ("idx_trips_user",              "trips",       "user_id",            "user_id"),
+    ("idx_cities_country",          "cities",      "country_code",       "country_code(16)"),
+    ("idx_cities_name",             "cities",      "name",               "name(24)"),
+    ("idx_notes_user",              "notes",       "user_id",            "user_id"),
+    ("idx_notes_share",             "notes",       "share_token",        "share_token"),
+    ("idx_favorites_user",          "favorites",   "user_id",            "user_id"),
+]
+
+
+def _mysql_index_exists(conn, table, name):
+    row = conn.execute(
+        "SELECT COUNT(*) AS c FROM information_schema.statistics "
+        "WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ?",
+        (table, name),
+    ).fetchone()
+    if row is None:
+        return False
+    return bool(row["c"] if isinstance(row, dict) else row[0])
+
+
+def _ensure_indexes(conn):
+    """补齐缺失的索引（幂等，失败不阻断启动）"""
+    for name, table, sqlite_cols, mysql_cols in INDEXES:
+        try:
+            if Config.DB_TYPE == "mysql":
+                # MySQL 不支持 CREATE INDEX IF NOT EXISTS，先查 information_schema 再建
+                if _mysql_index_exists(conn, table, name):
+                    continue
+                try:
+                    conn.execute(f"CREATE INDEX {name} ON {table} ({mysql_cols})")
+                except Exception:
+                    # 列可能是较短的 VARCHAR（前缀长度会超过列长），退化为不带前缀再建
+                    plain = re.sub(r"\(\d+\)", "", mysql_cols)
+                    conn.execute(f"CREATE INDEX {name} ON {table} ({plain})")
+            else:
+                conn.execute(f"CREATE INDEX IF NOT EXISTS {name} ON {table} ({sqlite_cols})")
+        except Exception as e:
+            # 索引已存在（并发创建）或旧库列缺失等情况：记录后继续，不影响服务
+            print(f"[models] 跳过索引 {name}: {e}")
 
 
 import re
@@ -199,6 +261,10 @@ def init_db():
             conn.execute(_compat_ddl(ddl))
         conn.commit()
 
+        # 补齐缺失索引（多用户/大数据量下避免全表扫描）
+        _ensure_indexes(conn)
+        conn.commit()
+
         # 城市表为空时导入 data/cities.json
         count = conn.execute("SELECT COUNT(*) AS c FROM cities").fetchone()
         if isinstance(count, dict):
@@ -207,6 +273,13 @@ def init_db():
             total = count[0]
         if total == 0:
             _seed_cities(conn)
+            # 校验结果：全新部署若两个数据源都没有，城市表会为空（搜索/AI 规划会失效），
+            # 这里给出明确指引，避免"启动成功但功能不可用"的困惑
+            count2 = conn.execute("SELECT COUNT(*) AS c FROM cities").fetchone()
+            total2 = count2["c"] if isinstance(count2, dict) else count2[0]
+            if total2 == 0:
+                print("[models] [警告] 城市表为空：未找到 server/data/cities.json。"
+                      "城市搜索与 AI 规划将不可用，请先执行: python scripts/import_all_cities.py")
     finally:
         conn.close()
 

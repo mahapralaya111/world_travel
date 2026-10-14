@@ -7,6 +7,7 @@ from datetime import datetime
 from flask import Blueprint, jsonify, request
 
 from auth import verify_token, get_token_from_request
+from config import Config
 from database import query_one, query_all, execute, execute_many, transaction
 from utils import route_distance, to_mysql_datetime
 
@@ -53,6 +54,51 @@ def _norm_points(raw):
         q["lat"], q["lng"] = lat, lng
         pts.append(q)
     return pts
+
+
+def _get_rev(trip_id, country_id):
+    """读取"行程+国家"当前同步版本号（无记录视为 0）"""
+    row = query_one(
+        "SELECT rev FROM sync_state WHERE trip_id = ? AND country_id = ?",
+        (trip_id, country_id))
+    if not row:
+        return 0
+    try:
+        return int(row["rev"])
+    except (KeyError, TypeError, ValueError):
+        return 0
+
+
+def _get_last_client_id(trip_id, country_id):
+    """读取上次写入该国家数据的客户端标识（无记录返回空串）"""
+    row = query_one(
+        "SELECT last_client_id FROM sync_state WHERE trip_id = ? AND country_id = ?",
+        (trip_id, country_id))
+    if not row:
+        return ""
+    return str(row.get("last_client_id") or "")
+
+
+def _bump_rev(conn, trip_id, country_id, client_id=""):
+    """同步成功后版本号 +1（原子 upsert），记录本次写入的客户端，返回最新版本号"""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if Config.DB_TYPE == "mysql":
+        sql = ("INSERT INTO sync_state (trip_id, country_id, rev, last_client_id, updated_at) "
+               "VALUES (?,?,?,?,?) "
+               "ON DUPLICATE KEY UPDATE rev = rev + 1, last_client_id = VALUES(last_client_id), "
+               "updated_at = VALUES(updated_at)")
+    else:
+        sql = ("INSERT INTO sync_state (trip_id, country_id, rev, last_client_id, updated_at) "
+               "VALUES (?,?,?,?,?) "
+               "ON CONFLICT(trip_id, country_id) DO UPDATE SET rev = rev + 1, "
+               "last_client_id = excluded.last_client_id, updated_at = excluded.updated_at")
+    conn.execute(sql, (trip_id, country_id, 1, client_id, now))
+    row = conn.execute(
+        "SELECT rev FROM sync_state WHERE trip_id = ? AND country_id = ?",
+        (trip_id, country_id)).fetchone()
+    if row is None:
+        return 1
+    return int(row["rev"] if isinstance(row, dict) else row[0])
 
 
 @trip_bp.route("", methods=["GET"])
@@ -160,7 +206,14 @@ def get_trip(trip_id):
     annotations = query_all(
         "SELECT * FROM annotations WHERE trip_id = ? ORDER BY id", (trip_id,))
     routes = query_all("SELECT * FROM routes WHERE trip_id = ? ORDER BY id", (trip_id,))
-    return ok({"trip": trip, "annotations": annotations, "routes": routes})
+    # 各国家的同步版本号：前端据此带上 base_rev，实现乐观锁（防多端覆盖）
+    sync_revs = {}
+    for r in query_all("SELECT country_id, rev FROM sync_state WHERE trip_id = ?", (trip_id,)):
+        try:
+            sync_revs[str(r["country_id"])] = int(r["rev"])
+        except (KeyError, TypeError, ValueError):
+            pass
+    return ok({"trip": trip, "annotations": annotations, "routes": routes, "sync_revs": sync_revs})
 
 
 @trip_bp.route("/<int:trip_id>", methods=["PUT"])
@@ -307,6 +360,22 @@ def sync_country(trip_id):
     if not country_id:
         return fail("缺少 country_id")
 
+    # 乐观锁：客户端可携带 base_rev（加载数据时的版本号）。
+    # 若与服务端当前版本不一致，说明期间已有别处同步过同一国家，
+    # 直接拒绝并返回 409，避免"后写覆盖先写"导致对方数据丢失。
+    # 例外：若上次写入者就是同一个 client_id（同一标签页的并发写），不算冲突。
+    base_rev = body.get("base_rev", None)
+    client_id = str(body.get("client_id") or "")[:64]
+    if base_rev is not None:
+        try:
+            base_rev_i = int(base_rev)
+        except (TypeError, ValueError):
+            base_rev_i = None
+        if base_rev_i is not None and base_rev_i != _get_rev(trip_id, country_id):
+            last_cid = _get_last_client_id(trip_id, country_id)
+            if not (client_id and last_cid and client_id == last_cid):
+                return fail("该国家数据已在其他窗口更新，请刷新后重试", code=409, http=409)
+
     annotations = body.get("annotations") or []
     routes = body.get("routes") or []
     if len(annotations) > 2000 or len(routes) > 2000:
@@ -342,7 +411,7 @@ def sync_country(trip_id):
             to_mysql_datetime(r.get("created_at")),
         ))
 
-    # 2) 删除旧数据 + 批量插入放在同一事务：任一步失败整体回滚，
+    # 2) 删除旧数据 + 批量插入 + 版本号递增放在同一事务：任一步失败整体回滚，
     #    避免"旧数据已删、新数据没插进去"导致用户地图数据丢失
     with transaction() as conn:
         conn.execute("DELETE FROM annotations WHERE trip_id = ? AND country_id = ?",
@@ -357,12 +426,14 @@ def sync_country(trip_id):
             conn.executemany(
                 "INSERT INTO routes (trip_id,country_id,country_name,client_id,name,points,color,distance,created_at) "
                 "VALUES (?,?,?,?,?,?,?,?,?)", route_rows)
+        new_rev = _bump_rev(conn, trip_id, country_id, client_id)
 
     _log_sync(trip_id, body, len(ann_rows), len(route_rows))
 
     return ok({
         "annotation_count": len(ann_rows),
         "route_count": len(route_rows),
+        "rev": new_rev,
     }, "同步成功")
 
 

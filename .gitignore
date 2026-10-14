@@ -26,3 +26,14 @@ local_docs/
 
 # 密钥文件
 server/.secret_key
+# 本地环境变量（数据库密码等，绝不提交）
+.env
+.env.local
+server/.env.local
+
+# SQLite WAL 模式产生的临时文件
+*.db-wal
+*.db-shm
+
+# Windows 下 curl -o nul 等误产生的占位文件
+nul
